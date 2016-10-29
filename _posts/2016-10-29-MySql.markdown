@@ -1,0 +1,333 @@
+---
+layout:     post
+title:      "MySql:解读MySql「原」"
+subtitle:   "MySql:Read the MySql "
+date:       2016-10-29
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/20161029MySql.jpg"
+tags:
+    - 数据库开发
+    - MySql
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+### MySql （关系型数据库管理系统）
+MySQL是一个关系型数据库管理系统，由瑞典MySQL AB 公司开发，目前属于 Oracle 旗下产品。MySQL 最流行的关系型数据库管理系统，在 WEB 应用方面MySQL是最好的 RDBMS (Relational Database Management System，关系数据库管理系统) 应用软件之一。
+MySQL是一种关联数据库管理系统，关联数据库将数据保存在不同的表中，而不是将所有数据放在一个大仓库内，这样就增加了速度并提高了灵活性。
+MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言。MySQL 软件采用了双授权政策，它分为社区版和商业版，由于其体积小、速度快、总体拥有成本低，尤其是开放源码这一特点，一般中小型网站的开发都选择 MySQL 作为网站数据库。
+由于其社区版的性能卓越，搭配 PHP 和 Apache 可组成良好的开发环境。
+
+### PHP&&MySql连接数据库
+- MySql
+```
+	//语法
+	mysql_connect(servername,username,password);
+	//例子
+		<?php
+			$con = mysql_connect("localhost","peter","abc123");
+			if (!$con)
+			  {
+			  die('Could not connect: ' . mysql_error());
+			  }
+			// some code
+			mysql_close($con);//关闭数据库
+		?>
+```
+- MySqli
+    Mysqli是php5之后才有的功能，没有开启扩展的朋友可以打开您的php.ini的配置文件。
+	查找下面的语句：;extension=php_mysqli.dll将其修改为：extension=php_mysqli.dll即可。
+	相对于mysql有很多新的特性和优势
+	（1）支持本地绑定、准备（prepare）等语法
+	（2）执行sql语句的错误代码
+	（3）同时执行多个sql
+	（4）另外提供了面向对象的调用接口的方法。 
+	  使用方法一：使用传统的面向过程的方法 
+```
+	      <?php
+			$connect = mysqli_connect('localhost','root','','volunteer') or die('Unale to connect');
+			$sql = "select * from vol_msg";
+			$result = mysqli_query($connect,$sql);
+			while($row = mysqli_fetch_row($result)){
+			echo $row[0];
+			}
+		  ?> 
+```
+
+     使用方法二：使用面向对象的方法调用接口（推荐使用） 
+```
+  <?php
+	//创建对象并打开连接，最后一个参数是选择的数据库名称
+	$mysqli = new mysqli('localhost','root','','volunteer');
+	//检查连接是否成功
+	if (mysqli_connect_errno()){
+	//注意mysqli_connect_error()新特性
+	die('Unable to connect!'). mysqli_connect_error();
+	}
+	$sql = "select * from vol_msg";
+	//执行sql语句，完全面向对象的
+	$result = $mysqli->query($sql);
+	while($row = $result->fetch_array()){
+	echo $row[0];
+	}
+  ?> 
+```
+- PDO
+    PDO是PHP 5新加入的一个重大功能，因为在PHP 5以前的php4/php3都是一堆的数据库扩展来跟各个数据库的连接和处理，什么 php_mysql.dll、php_pgsql.dll、php_mssql.dll、php_sqlite.dll等等扩展来连接MySQL、PostgreSQL、MS SQL Server、SQLite，同样的，我们必须借助 ADOdb、PEAR::DB、PHPlib::DB之类的数据库抽象类来帮助我们，无比烦琐和低效，毕竟，php代码的效率怎么能够我们直接用C/C++写的扩展斜率高捏？所以嘛，PDO的出现是必然的，大家要平静学习的心态去接受使用，也许你会发现能够减少你不少功夫哦。
+```
+	<?php
+		$dbms='mysql';     //数据库类型
+		$host='localhost'; //数据库主机名
+		$dbName='test';    //使用的数据库
+		$user='root';      //数据库连接用户名
+		$pass='';          //对应的密码
+		$dsn="$dbms:host=$host;dbname=$dbName";
+
+		try {
+		    $dbh = new PDO($dsn, $user, $pass); //初始化一个PDO对象
+		    echo "连接成功<br/>";
+		    /*你还可以进行一次搜索操作
+		    foreach ($dbh->query('SELECT * from FOO') as $row) {
+		        print_r($row); //你可以用 echo($GLOBAL); 来看到这些值
+		    }
+		    */
+		    $dbh = null;
+		} catch (PDOException $e) {
+		    die ("Error!: " . $e->getMessage() . "<br/>");
+		}
+		//默认这个不是长连接，如果需要数据库长连接，需要最后加一个参数：array(PDO::ATTR_PERSISTENT => true) 变成这样：
+		$db = new PDO($dsn, $user, $pass, array(PDO::ATTR_PERSISTENT => true));
+
+    ?>
+```
+### PHP&&MySql操作数据库
+- MySql
+  ```
+    1、PHP连接MySQL数据库
+	<?php
+	    $host ="localhost";//服务器地址
+	    $root ="root";//用户名
+	    $password ="admin";//密码
+	    $database ="beyondweb_test";//数据库名
+	                     
+	    $conn = mysql_connect($host,$root,$password);//连接数据库
+	    if(!$conn){
+	        die("数据库连接失败!".mysql_error());
+	    }else{
+	        echo"数据库连接成功";
+	    }
+	                         
+	    mysql_select_db($database,$conn);//选择数据库
+	    mysql_query("set names utf-8");//设置编码为utf-8
+	?>
+
+	2、向数据库中增加数据
+	SQL语句：	
+	CREATE TABLE user(
+	    id INT(20) PRIMARY KEY AUTO_INCREMENT,
+	    nikename VARCHAR(30),
+	    email VARCHAR(40)
+	);
+
+	然后来向数据库中添加数据：
+	<?php
+	    $query ="INSERT INTO user(nikename,email) VALUES(#张三#,#beyondwebdotcn@xxx.com#);";//#号代表单引号，使用单引号才是正确的
+	                   
+	    $result = mysql_query($query);
+	                   
+	    if(!$result){
+	        echo"Error!";
+	    }else{
+	        echo"Success!";
+	        mysql_close($conn);//关闭数据库连接
+	    }
+	?>
+
+	3、修改数据库中的数据
+
+	我们还基于user表进行操作，例如把“张三”改为“李四”，php代码如下：
+	<?php
+	    $query ="UPDATE user SET nikename=#李四# WHERE id=#1#;";//#号代表单引号，使用单引号才是正确的
+	                 
+	    $result = mysql_query($query);
+	                 
+	    if(!$result){
+	        echo"Error!";
+	    }else{
+	        echo"Success!";
+	        mysql_close($conn);//关闭数据库连接
+	    }
+	?>
+
+	其实也就是SQL语句变了，其它是完全一样的。
+
+	4、查询数据库
+
+	只需更换一下SQL语句就行了，如查询表内所有数据并以表格形式输出：
+	<?php
+	    $query ="SELECT * FROM user;";
+	            
+	    $result = mysql_query($query);
+	            
+	    if(!$result){
+	        echo"Error!";
+	    }else{
+	        echo"Success!";
+	    }
+	            
+	?>
+	    <br/>
+	    <table border="1px">
+	        <tr>
+	            <th>id</th>
+	            <th>nikename</th>
+	            <th>email</th>
+	        </tr>
+	<?php
+	    while($row = mysql_fetch_row($result)){
+	        echo"<tr>";
+	        echo"<td>".$row[0]."</td>";
+	        echo"<td>".$row[1]."</td>";
+	        echo"<td>".$row[2]."</td>";
+	        echo"</tr>";
+	    }
+	?>
+	    </table>
+	<?php
+	            
+	    mysql_close($conn);
+	            
+	?>
+
+	5、删除数据
+
+	前面已经给出了增加数据、修改数据、删除数据的解决方法，那么“增删改查”就剩一个“删”了，下面我们就来看一下删除数据是怎么回事，其实跟上面差不多，一句话的事儿，改个SQL语句就行了。来看PHP代码：	
+	<?php
+	    $query ="DELETE FROM user WHERE nikename=#张三#;";//#号代表单引号，使用单引号才是正确的
+	            
+	    $result = mysql_query($query);
+	            
+	    if(!$result){
+	        echo"Error!";
+	    }else{
+	        echo"Success!";
+	        mysql_close($conn);//关闭数据库连接
+	    }
+	?>
+
+  ```
+  参考地址：(http://www.php1.cn/article/8166.html)
+- MySqli
+  ```
+   1.mysqli扩展库操作数据库工具类
+
+	<?php
+	 //数据库操作类
+	  class DBUtil{
+	   private $host="localhost";
+	   private $username="root";
+	   private $password="123456";
+	   private $dbname="student";
+	   private $conn;
+	   public function DBUtil(){
+	     $this->conn=new mysqli($this->host, $this->username, $this->password,$this->dbname) or die($this->conn->connect_error);
+	    
+	   }
+	  //查询
+	   public function query($sql){
+	     $all= $this->conn->query($sql);
+	     return $all;
+	   }
+	  //插入,修改，删除
+	   public function otherOperate($sql){
+	      if($this->conn->query($sql)){
+	        if($this->conn->affected_rows>0){
+	           return "OK";
+	        }else{
+	           return "ERROOR";
+	        }
+	      }
+	   }
+	   public function close(){
+	     $this->conn->close();
+	   }
+	  }
+	?>
+
+	2.下面是具体的调用工具类的代码
+
+	<?php
+	  require_once "MySQLUtil.php";
+	   /*$sql="select * from m_student";
+	   $util=new DBUtil();
+	   $result=$util->query($sql);
+	   while($row=$result->fetch_assoc()){
+	   	 echo "$row[stuName]"."</br>";
+	   }
+	   $result->free();
+	   $util->close();*/
+	   $sql="update m_student set stuName='杨幂' where id=3";
+	   $util=new DBUtil();
+	   $result=$util->otherOperate($sql);
+	   echo $result;
+	   $util->close();
+	?>
+
+  ```
+  参考地址：(http://www.xuebuyuan.com/1637846.html)
+- PDO
+  ```
+  //查询
+   public function fetchAll($sql, $searchData = array(), $limit = array(0, 10), $dataMode = PDO::FETCH_ASSOC, $preType = array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)) {  
+    if ($sql) {  
+      $sql .= ' limit ' . (int) $limit[0] . ',' . (intval($limit[1]) > 0 ? intval($limit[1]) : 10);  
+      $pdoStatement = $this->pdo->prepare($sql, $preType);  
+      $pdoStatement->execute($searchData);  
+      return $data = $pdoStatement->fetchAll($dataMode);  
+    } else {  
+      return false;  
+    }  
+  }  
+  //添加 
+  public function insert($tableName, $data, $returnInsertId = false, $replace = false) {  
+    if(!empty($tableName) && count($data) > 0){  
+      $sql = $replace ? 'REPLACE INTO ' : 'INSERT INTO ';  
+      list($setSql, $mapData) = $this->FDFields($data);  
+      $sql .= $tableName . ' set ' . $setSql;  
+      $pdoStatement = $this->pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));  
+      $execRet = $pdoStatement->execute($mapData);  
+      return $execRet ? ($returnInsertId ? $this->pdo->lastInsertId() : $execRet) : false;  
+    } else {  
+      return false;  
+    }  
+  }  
+   //修改  
+  public function update($tableName, $data, $condition, $mapData = array(), $returnRowCount = true) {  
+    if(!empty($tableName) && count($data) > 0) {  
+      $sql = 'UPDATE ' . $tableName . ' SET ';  
+      list($setSql, $mapSetData) = $this->FDFields($data);  
+      $sql .= $setSql;  
+      $mapData = array_merge($mapData, $mapSetData);  
+      list($where, $mapData) = $this->FDCondition($condition, $mapData);  
+      $sql .= $where ? ' WHERE ' . $where : '';  
+      $pdoStatement = $this->pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));  
+      $execRet = $pdoStatement->execute($mapData);  
+      return $execRet ? ($returnRowCount ? $pdoStatement->rowCount() : $execRet) : false;  
+    } else {  
+      return false;  
+    }  
+  }  
+   //删除  
+  public function delete($tableName, $condition, $mapData = array()) {  
+    if(!empty($tableName) && $condition){  
+      $sql = 'DELETE FROM ' . $tableName;  
+      list($where, $mapData) = $this->FDCondition($condition, $mapData);  
+      $sql .= $where ? ' WHERE ' . $where : '';  
+      $pdoStatement = $this->pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));  
+      $execRet = $pdoStatement->execute($mapData);  
+      return $execRet;  
+    }  
+  }  
+  ```
+  参考地址：(http://blog.csdn.net/hello_katty/article/details/45840409)

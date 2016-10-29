@@ -3,7 +3,7 @@ layout:     post
 title:      "jekyll:搭建自己的博客「原」"
 subtitle:   "jekyll:Set up his own blog"
 date:       2016-10-27
-author:     "Hux"
+author:     "LingDie | 靈蝶"
 header-img: "img/12.jpg"
 tags:
     - 前端开发
