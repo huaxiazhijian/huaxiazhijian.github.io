@@ -4,7 +4,7 @@ title:      "Session&Cookie「原」"
 subtitle:   "Session&Cookie"
 date:       2016-10-29
 author:     "LingDie | 靈蝶"
-header-img: "img/blog/20161029Session.jpg"
+header-img: "img/blog/20161029session.jpg"
 tags:
     - 存储
     - Session
