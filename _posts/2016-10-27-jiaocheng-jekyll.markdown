@@ -1,14 +1,14 @@
 ---
-layout:     keynote
-title:      "Jekyll搭建属于自己的博客「QCon 北京 2016」"
-subtitle:   "Jekyll: Set up their own blog (QCon BeiJing 2016)"
-navcolor:   "invert"
-date:       2016-10-20
-author:     "LingDie"
+layout:     post
+title:      "jekyll:搭建自己的博客「原」"
+subtitle:   "jekyll:Set up his own blog"
+date:       2016-10-27
+author:     "Hux"
+header-img: "img/12.jpg"
 tags:
     - 前端开发
     - Jekyll
-    - Blog
+    - 原创
 ---
 世上无难事只怕有心人，同样的世上没有装不好的环境，只有找不对的教程。这不是心血来潮想搭建一个基于jekyll的个人博客环境，兴冲冲的就找官方文档
  结果一看就傻眼了，纳尼，全是英文，看的眼都花了都不知道怎么回事，严重的吐槽一下，所幸国内前辈挺多的，于是乎参照他们的来了，自己搭了一遍。
