@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="关于后台与开发、PHP与MySql | 靈蝶 | 这里是 靈蝶 的个人博客，与你一起发掘更大的世界。">
+    <meta name="keywords"  content="靈蝶, LingDie靈蝶, LingDie, 丿靈魂灬燈芐舞, 靈蝶的博客, LingDie Blog, 博客, 个人网站, 互联网, 后台, 开发, 码农">
+    <meta name="theme-color" content="#000000">
+    
+    <title>javascript正则表达式「原」 - 靈蝶的博客 | LingDie Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/20161028115013533.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://github.com/huaxiazhijian/huaxiazhijian.github.io/2016/11/01/jszhengze/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">LingDie Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/portfolio/">Portfolio</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/blog/2016111/jszhengze.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/blog/2016111/jszhengze.jpg')
+    }
+
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#javascript" title="javascript">javascript</a>
+                        
+                        <a class="tag" href="/tags/#前端" title="前端">前端</a>
+                        
+                        <a class="tag" href="/tags/#正则" title="正则">正则</a>
+                        
+                        <a class="tag" href="/tags/#原创" title="原创">原创</a>
+                        
+                    </div>
+                    <h1>javascript正则表达式「原」</h1>
+                    
+                    
+                    <h2 class="subheading">Javascript regular expressions </h2>
+                    
+                    <span class="meta">Posted by LingDie | 靈蝶 on November 1, 2016</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>下滑这里查看更多内容</p>
+</blockquote>
+
+<h3 id="javascript">javascript常用正则表达式规则</h3>
+
+<p>字符    描述 <br />
+/n      换行符 <br />
+/r      回车符 <br />
+/t      制表符 <br />
+/f      换页符（Tab） <br />
+/cX     与X对应的控制字符 <br />
+/b      退格符(BackSpace) <br />
+/v      垂直制表符 <br />
+/0      空字符(“”)</p>
+
+<h2 id="section">正则表达式中的预定义类：</h2>
+
+<p>代码  等同于                  匹配 <br />
+.     IE下[^/n]，其它[^/n/r]  匹配除换行符之外的任何一个字符 <br />
+/d    [0-9]                   匹配数字 <br />
+/D    [^0-9]                  匹配非数字字符 <br />
+/s    [ /n/r/t/f/x0B]         匹配一个空白字符 <br />
+/S    [^ /n/r/t/f/x0B]        匹配一个非空白字符 <br />
+/w    [a-zA-Z0-9_]            匹配字母数字和下划线 <br />
+/W    [^a-zA-Z0-9_]           匹配除字母数字下划线之外的字符</p>
+
+<h2 id="section-1">量词(下表量词单个出现时皆是贪婪量词)</h2>
+
+<p>代码  描述</p>
+<ul>
+  <li>匹配前面的子表达式零次或多次。例如，zo* 能匹配 “z” 以及 “zoo”。 * 等价于{0,}。</li>
+  <li>匹配前面的子表达式一次或多次。例如，’zo+’ 能匹配 “zo” 以及 “zoo”，但不能匹配 “z”。+ 等价于 {1,}。 <br />
+?     匹配前面的子表达式零次或一次。例如，”do(es)?” 可以匹配 “do” 或 “does” 中的”do” 。? 等价于 {0,1}。 <br />
+{n}   n 是一个非负整数。匹配确定的 n 次。例如，’o{2}’ 不能匹配 “Bob” 中的 ‘o’，但是能匹配 “food” 中的两个 o。 <br />
+{n,}  n 是一个非负整数。至少匹配n 次。例如，’o{2,}’ 不能匹配 “Bob” 中的 ‘o’，但能匹配 “foooood” 中的所有 o。’o{1,}’ 等价于 ‘o+’。’o{0,}’ 则等价于 ‘o*‘。 <br />
+{n,m} m 和 n 均为非负整数，其中n &lt;= m。最少匹配 n 次且最多匹配 m 次。刘， “o{1,3}” 将匹配 “fooooood” 中的前三个 o。’o{0,1}’ 等价于 ‘o?’。请注意在逗号和两个数之间不能有空格。</li>
+</ul>
+
+<h2 id="section-2">贪婪量词与惰性量词</h2>
+
+<ul>
+  <li>用贪婪量词进行匹配时，它首先会将整会字符串当成一个匹配，如果匹配的话就退出，如果不匹配，就截去最后一个字符进行匹配，如果不匹配，继续将最后一个字符截去进行匹配，直到有匹配为止。直到现在我们遇到的量词都是贪婪量词</li>
+  <li>用惰性量词进行匹配时，它首先将第一个字符当成一个匹配，如果成功则退出，如果失败，则测试前两个字符，依些增加，直到遇到合适的匹配为止</li>
+</ul>
+
+<p>惰性量词仅仅在贪婪量词后面加个”?”而已,如”a+”是贪婪匹配的,”a+?”则是惰性的 <br />
+构建一个验证电子邮箱地址有效性的正则表达式。电子邮箱地址有效性要求(我们姑且这样定义)：用户名只能包含字母数字以及下划线，最少一位，最多25位，用户名后面紧跟@，后面是域名，域名名称要求只能包含字母数字和减号（-），并且不能以减号开头或结尾，然后后面是域名后缀（可以有多个），域名后缀必须是点号连上2-4位英文字母 。</p>
+<h3 id="javascript-1">javascript正则表达式基本语法</h3>
+
+<ul>
+  <li>
+    <p>正则表达式基本语法<br />
+两个特殊的符号’^’和’$’。他们的作用是分别指出一个字符串的开始和结束。<br />
+例子如下：<br />
+“^The”：表示所有以”The”开始的字符串（”There”，”The cat”等）；<br />
+“of despair$”：表示所以以”of despair”结尾的字符串；<br />
+“^abc$”：表示开始和结尾都是”abc”的字符串——呵呵，只有”abc”自己了；<br />
+“notice”：表示任何包含”notice”的字符串。<br />
+象最后那个例子，如果你不使用两个特殊字符，你就在表示要查找的串在被查找串的任意部分——你并<br />
+不把它定位在某一个顶端。<br />
+其它还有’<em>‘，’+’和’?’这三个符号，表示一个或一序列字符重复出现的次数。<br />
+它们分别表示“没有或更多”，“一次或更多”还有“没有或一次”。<br />
+下面是几个例子：<br />
+“ab</em>“：表示一个字符串有一个a后面跟着零个或若干个b。（”a”, “ab”, “abbb”,……）；<br />
+“ab+”：表示一个字符串有一个a后面跟着至少一个b或者更多；<br />
+“ab?”：表示一个字符串有一个a后面跟着零个或者一个b；<br />
+“a?b+$”：表示在字符串的末尾有零个或一个a跟着一个或几个b。<br />
+你也可以使用范围，用大括号括起，用以表示重复次数的范围。<br />
+“ab{2}”：表示一个字符串有一个a跟着2个b（”abb”）；<br />
+“ab{2,}”：表示一个字符串有一个a跟着至少2个b；<br />
+“ab{3,5}”：表示一个字符串有一个a跟着3到5个b。<br />
+请注意，你必须指定范围的下限（如：”{0,2}”而不是”{,2}”）。<br />
+还有，你可能注意到了，’<em>‘，’+’和’?’相当于”{0,}”，”{1,}”和”{0,1}”。<br />
+还有一个’¦’，表示“或”操作：<br />
+“hi¦hello”：表示一个字符串里有”hi”或者”hello”；<br />
+“(b¦cd)ef”：表示”bef”或”cdef”；<br />
+“(a¦b)</em>c”：表示一串”a”“b”混合的字符串后面跟一个”c”；<br />
+‘.’可以替代任何字符：<br />
+“a.[0-9]”：表示一个字符串有一个”a”后面跟着一个任意字符和一个数字；<br />
+“^.{3}$”：表示有任意三个字符的字符串（长度为3个字符）；<br />
+方括号表示某些字符允许在一个字符串中的某一特定位置出现：<br />
+“[ab]”：表示一个字符串有一个”a”或”b”（相当于”a¦b”）；<br />
+“[a-d]”：表示一个字符串包含小写的’a’到’d’中的一个（相当于”a¦b¦c¦d”或者”[abcd]”）；<br />
+“^[a-zA-Z]”：表示一个以字母开头的字符串；<br />
+“[0-9]%”：表示一个百分号前有一位的数字；<br />
+“,[a-zA-Z0-9]$”：表示一个字符串以一个逗号后面跟着一个字母或数字结束。<br />
+你也可以在方括号里用’^’表示不希望出现的字符，’^’应在方括号里的第一位。<br />
+（如：”%[^a-zA-Z]%”表示两个百分号中不应该出现字母）。<br />
+为了逐字表达，你必须在”^.$()¦*+?{"这些字符前加上转移字符’'。<br />
+请注意在方括号中，不需要转义字符。</p>
+  </li>
+  <li>
+    <p>正则表达式验证控制文本框的输入字符类型</p>
+
+    <ul>
+      <li>只能输入数字和英文的：
+        <pre><code>&lt;input onkeyup="value=value.replace(/[\W]/g,'') " onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" ID="Text1" NAME="Text1"&gt;
+</code></pre>
+      </li>
+      <li>只能输入数字的：
+        <pre><code> &lt;input onkeyup="value=value.replace(/[^\d]/g,'') " onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" ID="Text2" NAME="Text2"&gt;
+</code></pre>
+      </li>
+      <li>只能输入汉字的：
+        <pre><code>&lt;input onkeyup="value=value.replace(/[^\u4E00-\u9FA5]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\u4E00-\u9FA5]/g,''))" ID="Text4" NAME="Text4"&gt;
+</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li>正则表达式的应用实例通俗说明<br />
+//校验是否全由数字组成<br />
+/^[0-9]{1,20}$/<br />
+^ 表示打头的字符要匹配紧跟^后面的规则<br />
+$ 表示打头的字符要匹配紧靠$前面的规则<br />
+[ ] 中的内容是可选字符集<br />
+[0-9] 表示要求字符范围在0-9之间<br />
+{1,20}表示数字字符串长度合法为1到20，即为[0-9]中的字符出现次数的范围是1到20次。<br />
+/^ 和 $/成对使用应该是表示要求整个字符串完全匹配定义的规则，而不是只匹配字符串中的一个子串。<br />
+<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>*<br />
+//校验登录名：只能输入5-20个以字母开头、可带数字、“<em>”、“.”的字串<br />
+/^[a-zA-Z]{1}([a-zA-Z0-9]|[.</em>]){4,19}$/<br />
+^[a-zA-Z]{1} 表示第一个字符要求是字母。<br />
+([a-zA-Z0-9]|[.<em>]){4,19} 表示从第二位开始（因为它紧跟在上个表达式后面）的一个长度为4到9位的字符串，它要求是由大小写字母、数字或者特殊字符集[.</em>]组成。<br />
+<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>*<br />
+//校验用户姓名：只能输入1-30个以字母开头的字串<br />
+/^[a-zA-Z]{1,30}$/ <br />
+<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>*<br />
+//校验密码：只能输入6-20个字母、数字、下划线<br />
+/^(\w){6,20}$/<br />
+\w：用于匹配字母，数字或下划线字符 <br />
+<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>*<br />
+//校验普通电话、传真号码：可以“+”或数字开头，可含有“-” 和 “ ”<br />
+/^[+]{0,1}(\d){1,3}[ ]?([-]?((\d)|[ ]){1,12})+$/<br />
+\d：用于匹配从0到9的数字；<br />
+“?”元字符规定其前导对象必须在目标对象中连续出现零次或一次<br />
+可以匹配的字符串如：+123 -999 999 ； +123-999 999 ；123 999 999 ；+123 999999等<br />
+<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>*<br />
+//校验URL<br />
+/^http[s]{0,1}:\/\/.+$/ 或 /^http[s]{0,1}:\/\/.{1,n}$/ (表示url串的长度为length(“https://”) + n )<br />
+ \ / ：表示字符“/”。<br />
+. 表示所有字符的集</li>
+  <li>等同于{1,}，就是1到正无穷吧。<br />
+ <strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>*<br />
+//校验纯中文字符<br />
+/<br />
+^[\u4E00-\u9FA5]+$/<br />
+[\u4E00-\u9FA5] ：估计是中文字符集的范围吧</li>
+</ul>
+
+<h3 id="javascript-2">javascript正则表达式实例</h3>
+
+<ul>
+  <li>判断输入内容是否为空
+    <pre><code> function IsNull(){    
+  var str = document.getElementById('str').value.trim();    
+  if(str.length==0){    
+      alert('对不起，文本框不能为空或者为空格!');//请将“文本框”改成你需要验证的属性名称!    
+  }    
+}    
+</code></pre>
+  </li>
+  <li>判断输入的字符是否为英文字母
+    <pre><code>function IsLetter()     
+{     
+      var str = document.getElementById('str').value.trim();    
+      if(str.length!=0){    
+      reg=/^[a-zA-Z]+$/;     
+      if(!reg.test(str)){    
+          alert("对不起，您输入的英文字母类型格式不正确!");//请将“英文字母类型”改成你需要验证的属性名称!    
+      }    
+      }    
+}     
+</code></pre>
+  </li>
+  <li>判断输入的字符是否为整数
+    <pre><code>function IsInteger()     
+{       
+      var str = document.getElementById('str').value.trim();    
+      if(str.length!=0){    
+      reg=/^[-+]?\d*$/;     
+      if(!reg.test(str)){    
+          alert("对不起，您输入的整数类型格式不正确!");//请将“整数类型”要换成你要验证的那个属性名称！    
+      }    
+      }    
+}     
+</code></pre>
+  </li>
+  <li>判断输入的字符是否为:a-z,A-Z,0-9
+    <pre><code> function IsString()     
+{     
+      var str = document.getElementById('str').value.trim();    
+      if(str.length!=0){    
+      reg=/^[a-zA-Z0-9_]+$/;     
+      if(!reg.test(str)){    
+          alert("对不起，您输入的字符串类型格式不正确!");//请将“字符串类型”要换成你要验证的那个属性名称！    
+      }    
+      }    
+}     
+</code></pre>
+  </li>
+  <li>判断输入的字符是否为中文
+    <pre><code>function IsChinese()     
+{     
+      var str = document.getElementById('str').value.trim();    
+      if(str.length!=0){    
+      reg=/^[\u0391-\uFFE5]+$/;    
+      if(!reg.test(str)){    
+          alert("对不起，您输入的字符串类型格式不正确!");//请将“字符串类型”要换成你要验证的那个属性名称！    
+      }    
+      }    
+}     
+</code></pre>
+  </li>
+  <li>判断输入的EMAIL格式是否正确
+    <pre><code> function IsEmail()     
+{     
+      var str = document.getElementById('str').value.trim();    
+      if(str.length!=0){    
+      reg=/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;    
+      if(!reg.test(str)){    
+          alert("对不起，您输入的字符串类型格式不正确!");//请将“字符串类型”要换成你要验证的那个属性名称！    
+      }    
+      }    
+}     
+</code></pre>
+  </li>
+  <li>判断输入的数字不大于某个特定的数字
+    <pre><code>function MaxValue()     
+{     
+  var val = document.getElementById('str').value.trim();    
+      if(str.length!=0){    
+      reg=/^[-+]?\d*$/;     
+      if(!reg.test(str)){//判断是否为数字类型    
+          if(val&gt;parseInt('123')) //“123”为自己设定的最大值    
+          {     
+              alert('对不起，您输入的数字超出范围');//请将“数字”改成你要验证的那个属性名称！    
+          }     
+      }    
+  }    
+}     
+</code></pre>
+  </li>
+</ul>
+
+<h3 id="section-3">几个常用正则</h3>
+
+<p>Phone : /^(((\d{2,3}))|(\d{3}-))?((0\d{2,3})|0\d{2,3}-)?[1-9]\d{6,7}(-\d{1,4})?$/    <br />
+ Mobile : /^(((\d{2,3}))|(\d{3}-))?13\d{9}$/    <br />
+ Url : /^http:\/\/[A-Za-z0-9]+.[A-Za-z0-9]+[\/=\?%-&amp;_~`@[]':+!]<em>([^&lt;&gt;""])</em>$/   <br />
+ IdCard : /^\d{15}(\d{2}[A-Za-z0-9])?$/   <br />
+ QQ : /^[1-9]\d{4,8}$/   <br />
+ 某种特殊金额：/^((\d{1,3}(,\d{3})<em>)|(\d+))(.\d{2})?$/               //说明：除“XXX    XX,XXX    XX,XXX.00”格式外<br />
+//为上面提供各个JS验证方法提供.trim()属性   <br />
+String.prototype.trim=function(){   <br />
+        return this.replace(/(^\s</em>)|(\s*$)/g, “”);    <br />
+    }</p>
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2016/11/01/jsajax/" data-toggle="tooltip" data-placement="top" title="javascript ajax「原」">
+                        Previous<br>
+                        <span>javascript ajax「原」</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2016/11/01/phpobject/" data-toggle="tooltip" data-placement="top" title="php面向对象编程「原」">
+                        Next<br>
+                        <span>php面向对象编程「原」</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#原创" title="原创" rel="7">
+                                    原创
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#javascript" title="javascript" rel="3">
+                                    javascript
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#前端" title="前端" rel="2">
+                                    前端
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a href="http://su.gallery/">Su</a></li>
+                    
+                        <li><a href="http://mida.re/">乱序</a></li>
+                    
+                        <li><a href="http://qianduan.guru/">前端外刊评论</a></li>
+                    
+                        <li><a href="http://lingyu.wang/">天镶的博客</a></li>
+                    
+                        <li><a href="http://hmqk1995.github.io">Luke 的自留地</a></li>
+                    
+                        <li><a href="http://ebnbin.com/">Ebn's Blog</a></li>
+                    
+                        <li><a href="http://blog.smdcn.net">SmdCn's Blog</a></li>
+                    
+                        <li><a href="http://xieminis.me/">解旻的博客</a></li>
+                    
+                        <li><a href="http://dhong.co">DHong Say</a></li>
+                    
+                        <li><a href="http://ingf.github.io/">尹峰以为</a></li>
+                    
+                        <li><a href="http://wepiaofei.github.io/blog/">前端神盾局</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/huaxiazhijian">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; LingDie Blog 2016
+                    <br>
+                    Theme by <a href="https://huaxiazhijian.github.io/">LingDie</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huaxiazhijian&repo=huaxiazhijian.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
