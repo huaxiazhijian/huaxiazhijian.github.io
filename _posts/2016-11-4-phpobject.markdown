@@ -38,63 +38,63 @@ tags:
 
 - 以人为列子：
 
-```
+{% highlight ruby %}
  <?php
 	header("Content-type:text/html;charset=utf-8");
 	class person{
-	//下面是人的成员属性
+	#下面是人的成员属性
 	var $name;
-	//人的名字
+	#人的名字
 	var $sex;
-	//人的性别
+	#人的性别
 	var $age;
-	//人的年龄
-	//定义一个构造方法参数为姓名$name,性别$sex和年龄$age
+	#人的年龄
+	#定义一个构造方法参数为姓名$name,性别$sex和年龄$age
 	function __construct($name,$sex,$age){
-	//通过构造方法传进来的$name给成员属性$this->name赋初始值
+	#通过构造方法传进来的$name给成员属性$this->name赋初始值
 	$this->name=$name;
-	//通过构造方法传进来的$sex给成员属性$this->sex赋初始值
+	#通过构造方法传进来的$sex给成员属性$this->sex赋初始值
 	$this->sex=$sex;
-	//通过构造方法传进来的$age给成员属性$this->age赋初始值
+	#通过构造方法传进来的$age给成员属性$this->age赋初始值
 	$this->age="$age";
 	}
-	//下面是人的成员方法
+	#下面是人的成员方法
 	function say()
-	//这个人可以说话的方法
+	#这个人可以说话的方法
 	{
 	echo "我的名字叫：".$this->name."性别；".$this->sex."我的年龄是：".$this->age."<br>";
 	}
-	function run() //这个人可以走路的方法
+	function run() #这个人可以走路的方法
 	{
 	echo "这个人在走路";
 	}
-	//这是一个析构函数，在对象销毁前调用
+	#这是一个析构函数，在对象销毁前调用
 	function __destruct()
 	{
 	echo "再见".$this->name."<br>";
 	}
 	}
-	//通过构造方法创建3个对象$p1,$p2,$p3，分别传入三个不同的实参为姓名性别和年龄
+	#通过构造方法创建3个对象$p1,$p2,$p3，分别传入三个不同的实参为姓名性别和年龄
 	$p1=new person("小明","男",20);
 	$p2=new person("熊","女",30);
 	$p3=new person("向日葵","男",25);
 	$p1->say();
 	$p2->say();
 	$p3->say();
-	//下面访问3个对象的说话方式$p1->say();$p2->say();$p3->say();
+	#下面访问3个对象的说话方式$p1->say();$p2->say();$p3->say();
 	?> 
-```
+{% endhighlight %}
 - php面向对象的几个步骤 
   - 第一类的定义：
-  ```
+  {% highlight ruby %}
   <?php
   Class myobject{
-    //……
+    #……
 	}
    ?>
-  ```
+  {% endhighlight  %}
   - 第二成员方法：
-  ```
+  {% highlight ruby %}
   <?php
 	classmyobject{
 	   function getobjectname($name){
@@ -102,21 +102,21 @@ tags:
 	   }
 	}
   ?>
-  ```
+  {% endhighlight %}
   - 第三类的实例化：
-  ```
+  {% highlight ruby %}
   <?php
 	class myobject{
 	  function getobjectname($name){
 	     echo "商品名称为：".$name;
 	   }
 	}
-	$c_book=new myobject();           //实例化对象
-	echo $c_book->getobjectname("计算机图书");  //调用getbookname()方法
+	$c_book=new myobject();           #实例化对象
+	echo $c_book->getobjectname("计算机图书");  #调用getbookname()方法
   ?>
-  ```
+  {% endhighlight  %}
   - 第四成员变量：
-  ```
+  {% highlight ruby %}
   <?php
 	class myobject{
 	  public $object_name;
@@ -132,41 +132,41 @@ tags:
 	echo $c_book->object_name."<br>";
 	echo $c_book->getobjectname();
   ?>
-  ```
+  {% endhighlight %}
   - 第五常量类：
     既然有变量，当然也会有常量了。常量就是不会改变的量，是一个恒值。众所周知的一个常量就是圆周率Pi。定义常量使用关键字const如：ConstPI=3.14159; 
-  ```
+  {% highlight ruby %}
   <?php
    class myobject{                        
-	  const book_type="计算机图书";             //声明常量book_type
-	  public $object_name;                                    //声明变量
-	  functionsetobjectname($name){                     //声明方法setobjectname()
-	      $this->object_name=$name;                       //设置成员的变量值
+	  const book_type="计算机图书";             #声明常量book_type
+	  public $object_name;                                    #声明变量
+	  functionsetobjectname($name){                     #声明方法setobjectname()
+	      $this->object_name=$name;                   #设置成员的变量值
 	  }
-	  functiongetobjectname(){                //声明方法getobject()
+	  functiongetobjectname(){                #声明方法getobject()
 	    return$this->object_name;                        
 	  }
 	}
-	$c_book=new myobject();                                 //实例化对象
-	$c_book->setobjectname("PHP的类");              //调用方法setobjectname
-	echo myobject::book_type."<br>";              //输出常量的值
-	echo $c_book->getobjectname();                 //调用方法getobjectname
+	$c_book=new myobject();                                 #实例化对象
+	$c_book->setobjectname("PHP的类");              #调用方法setobjectname
+	echo myobject::book_type."<br>";              #输出常量的值
+	echo $c_book->getobjectname();                 #调用方法getobjectname
   ?>
-  ```
+  {% endhighlight  %}
   - 第六面向对象类的构造方法:
-  ```
+  {% highlight ruby %}
   <?php
 	class myobject{                        
-	   public $object_name;   //商品名称
-	   public $object_price;              //商品价格
-	   public $object_num;        //商品数量
-	   public $object_agio;        //商品折扣
+	   public $object_name;   #商品名称
+	   public $object_price;              #商品价格
+	   public $object_num;        #商品数量
+	   public $object_agio;        #商品折扣
 	   …………
    }            
   ?>
-  ```
+  {% endhighlight %}
   - 声明一个myobject类的对象，并对这个类的一些成员变量赋初值。代码如下：
-  ```
+  {% highlight ruby %}
    <?php
 		class myobject{                        
 		   public $object_name;
@@ -188,17 +188,17 @@ tags:
 		echo $dress->getobjectname();  
 		?>
 		Void__construect([mixed args,[……]])
-  ```
+  {% endhighlight %}
   注意：函数中的__是两条下划线，不是一条。 
 - 实例2：
-  ```
+  {% highlight ruby %}
    <?php
 		class myobject{                        
 		  public $object_name;
 		  public $object_price;
 		  public $object_num;
 		  public $object_agio;
-		function__construct($name,$price,$num,$agio){   //通过参数给成员变量赋值
+		function__construct($name,$price,$num,$agio){   #通过参数给成员变量赋值
 		      $this->object_name=$name;
 		          $this->object_price=$price;
 		          $this->object_num=$num;
@@ -219,19 +219,19 @@ tags:
 		echo "<br>";
 		echo $c_book->getobjectname2();
   ?>
-  ```
+  {% endhighlight %}
   - 第七析构方法：
   概念
   析构方法的作用和构造方法正好相反，是对象被销毁时被调用的，作用是释放内存。析构方法的格式为：Void__destruct(void)
   例：
-  ```
+  {% highlight ruby %}
   <?php
 		class myobject{                        
 		  public $object_name;
 		  public $object_price;
 		  public $object_num;
 		  public $object_agio;
-		function__construct($name,$price,$num,$agio){   //通过参数给成员变量赋值
+		function__construct($name,$price,$num,$agio){   #通过参数给成员变量赋值
 		      $this->object_name=$name;
 		          $this->object_price=$price;
 		          $this->object_num=$num;
@@ -256,16 +256,16 @@ tags:
 		echo $c_book->getobjectname2();
 		unset($c_book);
   ?>
-  ```
+  {% endhighlight %}
   PHP使用的是一种“垃圾回收”机制，自动清除不再使用的对象，释放内存。就是说即使不使用unset函数，析构方法也会自动被调用，这里只是明确一下析构函数在何时被调用。一般情况下是不需要手动创建析构方法的。
-  ```
+  {% highlight ruby %}
    <?php
 	class myobject{                        
 	   public $object_name;
 	   public $object_price;
 	   public $object_num;
 	   public $object_agio;
-	function __construct($name,$price,$num,$agio){    //通过参数给成员变量赋值
+	function __construct($name,$price,$num,$agio){    #通过参数给成员变量赋值
 	       $this->object_name=$name;
 	          $this->object_price=$price;
 	          $this->object_num=$num;
@@ -289,23 +289,23 @@ tags:
 	echo "<br>";
 	echo $c_book->getobjectname2();
    ?>
-  ```
+  {% endhighlight %}
   - 第八继承和多状态的实现:
-  ```
+  {% highlight ruby %}
   Class subclass extends superclass{
    ……
   }
-  ```
+  {% endhighlight %}
   说明：subclass为子类的名称，superclass为父类名称。
   例：
-  ```
+  {% highlight ruby %}
    <?php
 		class myobject{                        
 		  public $object_name;
 		  public $object_price;
 		  public $object_num;
 		  public $object_agio;
-		function__construct($name,$price,$num,$agio){   //通过参数给成员变量赋值
+		function__construct($name,$price,$num,$agio){   #通过参数给成员变量赋值
 		      $this->object_name=$name;
 		          $this->object_price=$price;
 		          $this->object_num=$num;
@@ -321,42 +321,42 @@ tags:
 		         $this->book_type=$type;
 		         $this->object_num=$num;  
 		       }
-		       functionshowme(){                            //重写父类中的showme()方法。
+		       functionshowme(){                            #重写父类中的showme()方法。
 		         return "本次新进".$this->book_type."图书".$this->object_num."本"."<br>";
 		       }
 		}
 		class elec extends myobject{
-		   function showme(){                             //重写父类中的showme()方法
+		   function showme(){                             #重写父类中的showme()方法
 		         return "热卖商品：".$this->object_name."<br>"."原 价：".$this->object_price."<br>"."特 价".$this->object_price*$this->object_agio;
 		       }
 		}
-		$c_book=new book("计算机类",1000);   //声明一个book子类对象。
+		$c_book=new book("计算机类",1000);   #声明一个book子类对象。
 		$h_elec=new elec("待机王XX系列",1200,3,0.8);    //声明一个elec子类对象。
-		echo$c_book->showme()."<br>";   //输出book子类的showme()方法
-		echo $h_elec->showme();          //输出elec子类的是showme()方法
+		echo$c_book->showme()."<br>";   #输出book子类的showme()方法
+		echo $h_elec->showme();          #输出elec子类的是showme()方法
    ?>
-  ```
+  {% endhighlight %}
   子类继承了父类的所有成员变量和方法，包括构造函数。这就是继承的实现。
   当子类被创建时，PHP会先在子类中查找构造方法。如果子类有自己的构造方法，PHP会先调用子类中的方法，当子类中没有时，PHP则会去调用父类中的构造方法。
   两个子类重写了父类的方法showme()，所以两个对象虽然调用的都是showme()方法，但返回的却是两段不同的信息。这就是多态性的实现。
   - 第九this−>和操作符的使用1、this-> 
   在 前面类的实例化中，对如何调用成员方法有了基本的了解，那就是用对象名加方法名，格式为“对象名->方法名”。但在定义类时(如 myobject)，根本无法得知对象的名称是什么。这时如果调用类中的方法，就要用伪变量this−>。this的意思就是本身，所 以$this->只可以在类的内部使用。
   例：
-  ```
+  {% highlight ruby %}
   <?php
-	classexample{   //创建类example
-	  function exam(){   //创建成员方法
-	     if(isset($this)){            //判断变量$this是否存在
-	           echo "\$this的值为：".get_class($this);    //如果存在，输出$this所属类的名字
+	classexample{   #创建类example
+	  function exam(){   #创建成员方法
+	     if(isset($this)){            #判断变量$this是否存在
+	           echo "\$this的值为：".get_class($this);    #如果存在，输出$this所属类的名字
 	        }else{
 	           echo "$this未定义。";
 	        }
 	  }
 	}
-	$class_name=newexample();   //实例化对象
-	$class_name->exam();          //调用方法exam()
+	$class_name=newexample();   #实例化对象
+	$class_name->exam();          #调用方法exam()
   ?>
-  ```
+  {% endhighlight %}
   Get_class函数返回对象所属类的名字，如果不是对象，则返回false。 
   - 第十公共、私有和保护 
     - public公共成员
@@ -366,7 +366,7 @@ tags:
     -  private私有成员 
     被private关键字修饰的变量和方法，只能在所属类的内部被调用和修改，不可以在类外被访问。在子类中也不可以。
     例：
-    ```
+    {% highlight ruby %}
     <?php
 		class book{
 		private $name="computer";
@@ -386,12 +386,12 @@ tags:
 		echo "直接操作私有变量的结果：";
 		echo book:name;
     ?>
-    ```
+    {% endhighlight %}
     对于成员方法，如果没有写关键字，那么默认就是public。从本节开始，以后所有的方法及变量都会带个关键字，这是一种良好的书写习惯。 
     - protected保护成员 
     private 关键字可以将数据完全隐藏起来，除了在本类外，其他地方都不可以调用。子类也不可以。但对于有些变量希望子类能够调用，但对另外的类来说，还要做到封装。 这时，就可以使用protected。被protected修改的类成员，可以在类和子类中被调用，其他地方则不可以被调用。
     例：
-    ```
+    {% highlight ruby %}
     <?php
 		class book{
 		  protected $name="computer";
@@ -406,5 +406,5 @@ tags:
 		echo "但在其他的地方是不可以调用的，否则：";
 		$lbook->name="history";
     ?>
-    ```
+    {% endhighlight %}
 
