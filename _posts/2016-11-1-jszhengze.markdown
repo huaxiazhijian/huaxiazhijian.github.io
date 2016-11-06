@@ -99,20 +99,20 @@ tags:
 - 正则表达式验证控制文本框的输入字符类型
   
   - 只能输入数字和英文的：
-```
+{% highlight ruby %}
 <input onkeyup="value=value.replace(/[\W]/g,'') " onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" ID="Text1" NAME="Text1">
-```
+{% endhighlight %}
   - 只能输入数字的：
-```
+{% highlight ruby %}
  <input onkeyup="value=value.replace(/[^\d]/g,'') " onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" ID="Text2" NAME="Text2">
-```
+{% endhighlight %}
   - 只能输入汉字的：
-```
+{% highlight ruby %}
   <input onkeyup="value=value.replace(/[^\u4E00-\u9FA5]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\u4E00-\u9FA5]/g,''))" ID="Text4" NAME="Text4">
-```
+{% endhighlight %}
 
 - 正则表达式的应用实例通俗说明
-//校验是否全由数字组成
+  - 校验是否全由数字组成
 /^[0-9]{1,20}$/
 ^ 表示打头的字符要匹配紧跟^后面的规则
 $ 表示打头的字符要匹配紧靠$前面的规则
@@ -121,128 +121,127 @@ $ 表示打头的字符要匹配紧靠$前面的规则
 {1,20}表示数字字符串长度合法为1到20，即为[0-9]中的字符出现次数的范围是1到20次。
 /^ 和 $/成对使用应该是表示要求整个字符串完全匹配定义的规则，而不是只匹配字符串中的一个子串。
 *******************************************************************************
-//校验登录名：只能输入5-20个以字母开头、可带数字、“_”、“.”的字串
+  - 校验登录名：只能输入5-20个以字母开头、可带数字、“_”、“.”的字串
 /^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){4,19}$/
 ^[a-zA-Z]{1} 表示第一个字符要求是字母。
 ([a-zA-Z0-9]|[._]){4,19} 表示从第二位开始（因为它紧跟在上个表达式后面）的一个长度为4到9位的字符串，它要求是由大小写字母、数字或者特殊字符集[._]组成。
 *******************************************************************************
-//校验用户姓名：只能输入1-30个以字母开头的字串
+  - 校验用户姓名：只能输入1-30个以字母开头的字串
 /^[a-zA-Z]{1,30}$/ 
 *******************************************************************************
-//校验密码：只能输入6-20个字母、数字、下划线
+ - 校验密码：只能输入6-20个字母、数字、下划线
 /^(\w){6,20}$/
 \w：用于匹配字母，数字或下划线字符 
 *******************************************************************************
-//校验普通电话、传真号码：可以“+”或数字开头，可含有“-” 和 “ ”
+  - 校验普通电话、传真号码：可以“+”或数字开头，可含有“-” 和 “ ”
 /^[+]{0,1}(\d){1,3}[ ]?([-]?((\d)|[ ]){1,12})+$/
 \d：用于匹配从0到9的数字；
 “?”元字符规定其前导对象必须在目标对象中连续出现零次或一次
 可以匹配的字符串如：+123 -999 999 ； +123-999 999 ；123 999 999 ；+123 999999等
 *******************************************************************************
-//校验URL
+  - 校验URL
 /^http[s]{0,1}:\/\/.+$/ 或 /^http[s]{0,1}:\/\/.{1,n}$/ (表示url串的长度为length(“https://”) + n )
  \ / ：表示字符“/”。
 . 表示所有字符的集
 + 等同于{1,}，就是1到正无穷吧。
  *******************************************************************************
-//校验纯中文字符
-/
-^[\u4E00-\u9FA5]+$/
+  - 校验纯中文字符
+/^[\u4E00-\u9FA5]+$/
 [\u4E00-\u9FA5] ：估计是中文字符集的范围吧
 
 
 ### javascript正则表达式实例
 
 - 判断输入内容是否为空
-```
+{% highlight ruby %}
  function IsNull(){    
     var str = document.getElementById('str').value.trim();    
     if(str.length==0){    
-        alert('对不起，文本框不能为空或者为空格!');//请将“文本框”改成你需要验证的属性名称!    
+        alert('对不起，文本框不能为空或者为空格!');#请将“文本框”改成你需要验证的属性名称!    
     }    
 }    
-```
+{% endhighlight %}
 - 判断输入的字符是否为英文字母 
-```
+{% highlight ruby %}
   function IsLetter()     
 {     
         var str = document.getElementById('str').value.trim();    
         if(str.length!=0){    
         reg=/^[a-zA-Z]+$/;     
         if(!reg.test(str)){    
-            alert("对不起，您输入的英文字母类型格式不正确!");//请将“英文字母类型”改成你需要验证的属性名称!    
+            alert("对不起，您输入的英文字母类型格式不正确!");#请将“英文字母类型”改成你需要验证的属性名称!    
         }    
         }    
 }     
-```
+{% endhighlight %}
 - 判断输入的字符是否为整数
-```
+{% highlight ruby %}
 function IsInteger()     
 {       
         var str = document.getElementById('str').value.trim();    
         if(str.length!=0){    
         reg=/^[-+]?\d*$/;     
         if(!reg.test(str)){    
-            alert("对不起，您输入的整数类型格式不正确!");//请将“整数类型”要换成你要验证的那个属性名称！    
+            alert("对不起，您输入的整数类型格式不正确!");#请将“整数类型”要换成你要验证的那个属性名称！    
         }    
         }    
 }     
-```
+{% endhighlight %}
 - 判断输入的字符是否为:a-z,A-Z,0-9
-```
+{% highlight ruby %}
  function IsString()     
 {     
         var str = document.getElementById('str').value.trim();    
         if(str.length!=0){    
         reg=/^[a-zA-Z0-9_]+$/;     
         if(!reg.test(str)){    
-            alert("对不起，您输入的字符串类型格式不正确!");//请将“字符串类型”要换成你要验证的那个属性名称！    
+            alert("对不起，您输入的字符串类型格式不正确!");#请将“字符串类型”要换成你要验证的那个属性名称！    
         }    
         }    
 }     
-```
+{% endhighlight %}
 - 判断输入的字符是否为中文
-```
+{% highlight ruby %}
 function IsChinese()     
 {     
         var str = document.getElementById('str').value.trim();    
         if(str.length!=0){    
         reg=/^[\u0391-\uFFE5]+$/;    
         if(!reg.test(str)){    
-            alert("对不起，您输入的字符串类型格式不正确!");//请将“字符串类型”要换成你要验证的那个属性名称！    
+            alert("对不起，您输入的字符串类型格式不正确!");#请将“字符串类型”要换成你要验证的那个属性名称！    
         }    
         }    
 }     
-```
+{% endhighlight %}
 - 判断输入的EMAIL格式是否正确 
-```
+{% highlight ruby %}
  function IsEmail()     
 {     
         var str = document.getElementById('str').value.trim();    
         if(str.length!=0){    
         reg=/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;    
         if(!reg.test(str)){    
-            alert("对不起，您输入的字符串类型格式不正确!");//请将“字符串类型”要换成你要验证的那个属性名称！    
+            alert("对不起，您输入的字符串类型格式不正确!");#请将“字符串类型”要换成你要验证的那个属性名称！    
         }    
         }    
 }     
-```
+{% endhighlight %}
 - 判断输入的数字不大于某个特定的数字
-```
+{% highlight ruby %}
 function MaxValue()     
 {     
     var val = document.getElementById('str').value.trim();    
         if(str.length!=0){    
         reg=/^[-+]?\d*$/;     
         if(!reg.test(str)){//判断是否为数字类型    
-            if(val>parseInt('123')) //“123”为自己设定的最大值    
+            if(val>parseInt('123')) #“123”为自己设定的最大值    
             {     
-                alert('对不起，您输入的数字超出范围');//请将“数字”改成你要验证的那个属性名称！    
+                alert('对不起，您输入的数字超出范围');#请将“数字”改成你要验证的那个属性名称！    
             }     
         }    
     }    
 }     
-```
+{% endhighlight %}
 
 ### 几个常用正则
 
@@ -251,8 +250,8 @@ Phone : /^((\(\d{2,3}\))|(\d{3}\-))?(\(0\d{2,3}\)|0\d{2,3}-)?[1-9]\d{6,7}(\-\d{1
  Url : /^http:\/\/[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\':+!]*([^<>\"\"])*$/   
  IdCard : /^\d{15}(\d{2}[A-Za-z0-9])?$/   
  QQ : /^[1-9]\d{4,8}$/   
- 某种特殊金额：/^((\d{1,3}(,\d{3})*)|(\d+))(\.\d{2})?$/               //说明：除“XXX    XX,XXX    XX,XXX.00”格式外
-//为上面提供各个JS验证方法提供.trim()属性   
+ 某种特殊金额：/^((\d{1,3}(,\d{3})*)|(\d+))(\.\d{2})?$/               #说明：除“XXX    XX,XXX    XX,XXX.00”格式外
+#为上面提供各个JS验证方法提供.trim()属性   
 String.prototype.trim=function(){   
         return this.replace(/(^\s*)|(\s*$)/g, "");    
     }

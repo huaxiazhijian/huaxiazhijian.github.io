@@ -21,7 +21,7 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 
 ### PHP&&MySql连接数据库
 - MySql
-```
+{% highlight ruby %}
 	//语法
 	mysql_connect(servername,username,password);
 	//例子
@@ -34,7 +34,7 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 			// some code
 			mysql_close($con);//关闭数据库
 		?>
-```
+{% endhighlight %}
 - MySqli
     Mysqli是php5之后才有的功能，没有开启扩展的朋友可以打开您的php.ini的配置文件。
 	查找下面的语句：;extension=php_mysqli.dll将其修改为：extension=php_mysqli.dll即可。
@@ -44,7 +44,7 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 	（3）同时执行多个sql
 	（4）另外提供了面向对象的调用接口的方法。 
 	  使用方法一：使用传统的面向过程的方法 
-```
+{% highlight ruby %}
 	      <?php
 			$connect = mysqli_connect('localhost','root','','volunteer') or die('Unale to connect');
 			$sql = "select * from vol_msg";
@@ -53,10 +53,10 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 			echo $row[0];
 			}
 		  ?> 
-```
+{% endhighlight %}
 
      使用方法二：使用面向对象的方法调用接口（推荐使用） 
-```
+{% highlight ruby %}
   <?php
 	//创建对象并打开连接，最后一个参数是选择的数据库名称
 	$mysqli = new mysqli('localhost','root','','volunteer');
@@ -72,10 +72,10 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 	echo $row[0];
 	}
   ?> 
-```
+{% endhighlight %}
 - PDO
     PDO是PHP 5新加入的一个重大功能，因为在PHP 5以前的php4/php3都是一堆的数据库扩展来跟各个数据库的连接和处理，什么 php_mysql.dll、php_pgsql.dll、php_mssql.dll、php_sqlite.dll等等扩展来连接MySQL、PostgreSQL、MS SQL Server、SQLite，同样的，我们必须借助 ADOdb、PEAR::DB、PHPlib::DB之类的数据库抽象类来帮助我们，无比烦琐和低效，毕竟，php代码的效率怎么能够我们直接用C/C++写的扩展斜率高捏？所以嘛，PDO的出现是必然的，大家要平静学习的心态去接受使用，也许你会发现能够减少你不少功夫哦。
-```
+{% highlight ruby %}
 	<?php
 		$dbms='mysql';     //数据库类型
 		$host='localhost'; //数据库主机名
@@ -100,10 +100,10 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 		$db = new PDO($dsn, $user, $pass, array(PDO::ATTR_PERSISTENT => true));
 
     ?>
-```
+{% endhighlight %}
 ### PHP&&MySql操作数据库
 - MySql
-  ```
+  {% highlight ruby %}
     1、PHP连接MySQL数据库
 	<?php
 	    $host ="localhost";//服务器地址
@@ -194,17 +194,23 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 	    }
 	?>
 	    </table>
+		
 	<?php
 	            
 	    mysql_close($conn);
 	            
 	?>
+	{% endhighlight%}
+	
+	{% highlight ruby %}
 
 	5、删除数据
-
-	前面已经给出了增加数据、修改数据、删除数据的解决方法，那么“增删改查”就剩一个“删”了，下面我们就来看一下删除数据是怎么回事，其实跟上面差不多，一句话的事儿，改个SQL语句就行了。来看PHP代码：	
+	
+	前面已经给出了增加数据、修改数据、删除数据的解决方法，那么“增删改查”就剩一个“删”了，
+	下面我们就来看一下删除数据是怎么回事，其实跟上面差不多，一句话的事儿，改个SQL语句就行了。来看PHP代码：	
 	<?php
-	    $query ="DELETE FROM user WHERE nikename=#张三#;";//#号代表单引号，使用单引号才是正确的
+	    $query ="DELETE FROM user WHERE nikename=#张三#;";
+		//#号代表单引号，使用单引号才是正确的
 	            
 	    $result = mysql_query($query);
 	            
@@ -216,10 +222,10 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 	    }
 	?>
 
-  ```
+  {% endhighlight %}
   参考地址：(http://www.php1.cn/article/8166.html)
 - MySqli
-  ```
+  {% highlight ruby %}
    1.mysqli扩展库操作数据库工具类
 
 	<?php
@@ -259,14 +265,15 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 
 	<?php
 	  require_once "MySQLUtil.php";
-	   /*$sql="select * from m_student";
-	   $util=new DBUtil();
-	   $result=$util->query($sql);
-	   while($row=$result->fetch_assoc()){
-	   	 echo "$row[stuName]"."</br>";
-	   }
-	   $result->free();
-	   $util->close();*/
+	   #$sql="select * from m_student";
+	   #$util=new DBUtil();
+	   #$result=$util->query($sql);
+	   #while($row=$result->fetch_assoc()){
+	   	 #echo "$row[stuName]"."</br>";
+	   #}
+	   #$result->free();
+	   #$util->close();
+	   
 	   $sql="update m_student set stuName='杨幂' where id=3";
 	   $util=new DBUtil();
 	   $result=$util->otherOperate($sql);
@@ -274,10 +281,10 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
 	   $util->close();
 	?>
 
-  ```
+  {% endhighlight %}
   参考地址：(http://www.xuebuyuan.com/1637846.html)
 - PDO
-  ```
+  {% highlight ruby %}
   //查询
    public function fetchAll($sql, $searchData = array(), $limit = array(0, 10), $dataMode = PDO::FETCH_ASSOC, $preType = array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)) {  
     if ($sql) {  
@@ -329,5 +336,5 @@ MySQL所使用的 SQL 语言是用于访问数据库的最常用标准化语言�
       return $execRet;  
     }  
   }  
-  ```
+  {% endhighlight %}
   参考地址：(http://blog.csdn.net/hello_katty/article/details/45840409)

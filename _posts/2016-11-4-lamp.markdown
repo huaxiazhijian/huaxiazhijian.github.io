@@ -18,53 +18,53 @@ tags:
 
 CentOS 7.0默认使用的是firewall作为防火墙。 
 - 关闭firewall：
-```
+{% highlight ruby %}
 systemctl stop firewalld.service #停止firewall  
 systemctl disable firewalld.service #禁止firewall开机启动  
-```
+{% endhighlight %}
 - 关闭SELINUX
-```
+{% highlight ruby %}
 vi /etc/selinux/config  
 #SELINUX=enforcing #注释掉  
 SELINUX=disabled #增加  
 :wq! #保存退出  
 setenforce 0 #使配置立即生效
-```
+{% endhighlight %}
 ### 环境搭建
 
 - 安装apache
-```
+{% highlight ruby %}
 yum install httpd #根据提示，输入Y安装即可成功安装  
 systemctl start httpd.service #启动apache  
 systemctl stop httpd.service #停止apache  
 systemctl restart httpd.service #重启apache  
 systemctl enable httpd.service #设置apache开机启动  
-```
+{% endhighlight %}
 - 安装mariadb（MySQL）
-```
+{% highlight ruby %}
 yum install mariadb mariadb-server #询问是否要安装，输入Y即可自动安装,直到安装完成  
 systemctl start mariadb.service #启动MariaDB  
 systemctl stop mariadb.service #停止MariaDB  
 systemctl restart mariadb.service #重启MariaDB  
 systemctl enable mariadb.service #设置开机启动 
-```
+{% endhighlight %}
 进入mysql
-```
+{% highlight ruby %}
 mysql -u用户名 -p密码 进入mysql
 修改mysql密码：set password for 'root'@'localhost'=password('root'); 
-```
+{% endhighlight %}
 - 安装PHP 7以及组件，使PHP支持 MariaDB 
 如果我们已经安装过了PHP，首先将原来的php卸载：
-```
+{% highlight ruby %}
 yum remove php php-common 
-```
+{% endhighlight %}
 由于Linux的yum源不存在php7.0，所以我们要更改yum源：
-```
+{% highlight ruby %}
 rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm      
 rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm  
-```
+{% endhighlight %}
 然后安装各种扩展：
-```
+{% highlight ruby %}
 yum install php70w php70w-cli php70w-common php70w-devel php70w-embedded php70w-fpm php70w-gd php70w-mbstring php70w-mysql php70w-opcache php70w-pdo php70w-xml 
-```
+{% endhighlight %}
 最后重启apache!
