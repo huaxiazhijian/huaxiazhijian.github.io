@@ -1,0 +1,86 @@
+---
+layout:     post
+title:      "LNMP 开发环境搭建「原」"
+subtitle:   "LNMP development environment to build"
+date:       2016-11-7
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2016114/lnmp.jpg"
+tags:
+    - Linux
+    - 环境搭建
+    - LNMP
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+### 安装nginx
+
+{% highlight ruby %}
+    yum install yum-priorities -y  
+    wget http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm  
+    rpm -ivh nginx-release-centos-7-0.el7.ngx.noarch.rpm  
+    yum install nginx  
+{% endhighlight %}
+{% highlight ruby %}
+    systemctl start nginx.service #启动nginx  
+    systemctl stop nginx.service #停止  
+    systemctl restart nginx.service #重启  
+    systemctl enable nginx.service #设置开机启动   
+{% endhighlight %}
+
+### 更改nginx端口号（根据自己需求 例如：LAMP&&LNMP双环境同时存在）
+
+{% highlight ruby %}
+    cd /etc/nginx/conf.d/  
+    vim default.conf  
+    把listen 80改成listen 81  
+{% endhighlight %}
+{% highlight ruby %}
+    systemctl restart nginx.service #重启nginx  
+{% endhighlight %}
+访问http://ip:81即可看到nginx首页
+
+### 安装php-fpm
+
+{% highlight ruby %}
+ yum install php-fpm  
+{% endhighlight %}
+{% highlight ruby %}
+    systemctl start php-fpm.service #启动php-fpm  
+    systemctl enable php-fpm.service #设置开机启动  
+{% endhighlight %}
+
+### 更改nginx配置文件识别php
+
+ vi /etc/nginx/conf.d/default.conf，把之前的#给去掉就可以了，顺手改一下fastcgi_param
+{% highlight ruby %}
+    location ~ \.php$ {  
+        root           html;  
+        fastcgi_pass   127.0.0.1:9000;  
+        fastcgi_index  index.php;  
+        fastcgi_param  SCRIPT_FILENAME  /usr/share/nginx/html/$fastcgi_script_name;  
+        include        fastcgi_params;  
+    }  
+{% endhighlight %}
+
+###  负载配置
+
+{% highlight ruby %}
+    upstream site{  
+            server 172.16.170.138;  
+            server 172.16.170.139;  
+    }  
+    server {  
+        listen       80;  
+        server_name  localhost;  
+      
+        #charset koi8-r;  
+        #access_log  /var/log/nginx/log/host.access.log  main;  
+      
+        location / {  
+            root   /usr/share/nginx/html;  
+            index  index.html index.htm;  
+            proxy_pass http://site;  
+        }  
+{% endhighlight %}
