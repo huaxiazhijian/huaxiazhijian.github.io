@@ -1,0 +1,137 @@
+---
+layout:     post
+title:      "PHP字符处理函数（二）「原」"
+subtitle:   "The PHP handler characters （二） "
+date:       2014-3-8
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/zifu2.jpg"
+tags:
+    - PHP
+    - 字符
+    - 函数
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+### 7.控制大小写
+
+{% highlight ruby %}
+
+       <?php  
+    print ucfirst("how do you do today?");  
+    echo "<br>";  
+    print ucwords("the prince of wales");  
+    echo "<br>";  
+    print strtoupper("i'm not yelling!");  
+    echo "<br>";  
+    print strtolower("CHINA");  
+    ?>  
+
+{% endhighlight %}
+
+How do you do today?
+The Prince Of Wales
+I'M NOT YELLING!
+china 
+
+### 8.在字符串中插入函数和表达式
+
+当你想包含的值不能直接出现在字符串中时，就是用字符串连接操作符(.)
+
+{% highlight ruby %}
+
+    <?php  
+    $amounts['payment'] = 100;  
+    echo 'You owe '.$amounts['payment'].' immediately';  
+    ?>  
+
+{% endhighlight %}
+
+You owe 100 immediately
+
+### 9.删除字符串两端的空白符
+
+ltrim()用于删除字符串开始出的空白符。
+rtrim()用于删除字符串结尾处的空白符。
+trim()用于删除字符串开始和结尾处的空白符。
+
+{% highlight ruby %}
+
+        <?php  
+    $zipcode = trim($_REQUEST['zipcode']);  
+    $no_linefeed = rtrim($_REQUEST['text']);  
+    $name = ltrim($_REQUEST['name']);  
+    ?>  
+
+{% endhighlight %}
+
+### 9.分离字符串
+
+explode — 使用一个字符串分割另一个字符串
+array explode (string $delimiter, string $string [,int $limit])
+此函数返回由字符串组成的数组，每个元素都是 string 的一个子串，它们被字符串 delimiter 作为边界点分割出来。
+参数：
+delimiter：边界上的分隔字符
+string：输入的字符串
+limit：如果设置了limit参数并且是正数，则返回的数组包含最多limit个元素，而最后那个元素将包含string的剩余部分。
+
+{% highlight ruby %}
+
+    <?php  
+    $words = explode(' ','My sentence is not very complicated');  
+    for ($x=0; $x<count($words); $x++){  
+        echo $words[$x];  
+        echo "<br>";  
+    }  
+    ?>  
+
+{% endhighlight %}
+
+输出：
+
+My
+sentence
+is
+not
+very
+complicated
+
+split — 用正则表达式将字符串分割到数组中
+array split(string $pattern, string $string [, int $limit])
+
+preg_split — 通过一个正则表达式分隔字符串
+array preg_split(string $pattern, string $subject [, int $limit = -1 [, int $flags = 0 ]])
+通过一个正则表达式分隔给定字符串
+参数：
+pattern:用于搜索的模式，字符串形式。
+subject:输入字符串
+limit:如果指定，将限制分隔得到的子串最多只有limit个，返回的最后一个 子串将包含所有剩余部分。
+flags：flags 可以是任何下面标记的组合(以位或运算 | 组合)：
+PREG_SPLIT_NO_EMPTY
+如果这个标记被设置， preg_split() 将进返回分隔后的非空部分。
+PREG_SPLIT_DELIM_CAPTURE
+如果这个标记设置了，用于分隔的模式中的括号表达式将被捕获并返回。
+PREG_SPLIT_OFFSET_CAPTURE
+如果这个标记被设置, 对于每一个出现的匹配返回时将会附加字符串偏移量. 注意：这将会改变返回数组中的每一个元素, 使其每个元素成为一个由第0 个元素为分隔后的子串，第1个元素为该子串在subject 中的偏移量组成的数组
+
+{% highlight ruby %}
+
+     <?php  
+    $words = split(' +','This sentence has some extra whitespace in it.');  
+    $words = preg_split('/\d\. /','my day: 1. get up 2. get dressed 3. eat toast');  
+    ?>     
+
+{% endhighlight %}
+
+使用spliti()或者在preg_split()中使用
+//i标志，表示匹配的分隔符不区分大小写。
+
+{% highlight ruby %}
+
+    <?php  
+    $words = spliti(' x ','31 inches x 22 inches X 9 inches');  
+    $words = preg_split('/ x /i','31 inches x 22 inches X 9 inches');  
+    ?>  
+
+{% endhighlight %}
