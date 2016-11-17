@@ -1,0 +1,108 @@
+---
+layout:     post
+title:      "php中读写excel表格文件示例 「转」"
+subtitle:   "PHP to read and write excel spreadsheet file example  "
+date:       2014-4-25
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/excel.jpg"
+tags:
+    - PHP
+    - excel
+    - 转载
+---
+
+### 读取excel表格文件。
+
+第一步、下载开源的PHPExcel的类库文件，官方网站是http://www.codeplex.com/PHPExcel。里面也有很多示例包。
+
+第二步、读取的基本代码示例：
+
+{% highlight ruby %}
+
+
+require_once 'Classes/PHPExcel.php';
+require_once 'Classes/PHPExcel/IOFactory.php';
+require_once 'Classes/PHPExcel/Reader/Excel5.php';
+
+$file_url = './excel/phpLv.xls';
+$objReader = PHPExcel_IOFactory::createReader('Excel5');
+$objPHPExcel = $objReader->load($file_url);
+#设置当前活动的工作表
+$objPHPExcel->setActiveSheetIndex(1);
+#拿到当前活动的表。以后操作就用这个了。劳资才不喜欢链式操作，太难看了好不啦
+$activeSheet = $objPHPExcel->getActiveSheet();
+#当前表最大行数
+$highestRow = $activeSheet->getHighestRow();
+#当前表最大列数
+$highestColumn = $activeSheet->getHighestColumn();
+
+echo "最大列：$highestColumn";
+echo "最大行：$highestRow";
+echo '<hr/>';
+
+$cell = function ($cell) use ($activeSheet) {
+    return $activeSheet->getCell("$cell")->getValue();
+};
+
+$str1 = $cell('A13');
+echo $str1;
+exit;
+
+{% endhighlight %}
+
+### 导出excel表格文件。
+
+第一步、同上也是先下载PHPExcel类库文件。
+
+第二步、导出excel文件的示例代码：
+
+{% highlight ruby %}
+
+#--------------------------------导出excel文件--------------------------------
+  require_once './Classes/PHPExcel.php';
+  $objPHPExcel=new PHPExcel();
+  #一些关于excel文件的描述。在Classes/PHPExcel/DocumentProperties.php中有更多选项
+  $prop = $objPHPExcel->getProperties();
+  $prop->setCreator('sweat_xiaoMa');
+  $prop->setLastModifiedBy('xiaoma');
+  $prop->setTitle('Office 2007 XLSX Document');
+  $prop->setSubject('Office 2007 XLSX Document');
+ $prop->setDescription('Document for Office 2007 XLSX, generated using PHP classes.');
+ $prop->setKeywords('office 2007 openxml php');
+ $prop->setCategory('Result file');
+ 
+ #设置使用的当前的工作表的索引
+ $objPHPExcel->setActiveSheetIndex(0);
+ #然后就可以设置单元格上的内容了。
+ $activeSheet = $objPHPExcel->getActiveSheet();
+ $activeSheet->setCellValue('A1','学号');
+ $activeSheet->setCellValue('B1','年级');
+ $activeSheet->setCellValue('C1','班级');
+ $activeSheet->setCellValue('D1','姓名');
+ $activeSheet->setCellValue('E1','性别');
+ 
+#给当前使用的工作表设置标题。
+ $activeSheet->setTitle('工作表1啦啦啦');
+2#文件名字。下面的header中用到。
+ $filename = '学生信息统计表_'.date('Y-m-dHis');
+ 
+#/*
+# *生成xlsx文件
+# */
+# header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+# header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
+# header('Cache-Control: max-age=0');
+# $objWriter=PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+ 
+# /*
+# *生成xls文件
+# */
+ header('Content-Type: application/vnd.ms-excel');
+ header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
+ header('Cache-Control: max-age=0');
+ $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+ $objWriter->save('php://output');
+ exit;
+
+{% endhighlight %}
+

@@ -1,0 +1,75 @@
+---
+layout:     post
+title:      "php读取zip文件(删除文件,提取文件,增加文件)实例「原」"
+subtitle:   "PHP to read zip files, (delete files, extract the files, add files) "
+date:       2014-5-15
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/zip.jpg"
+tags:
+    - PHP
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+{% highlight ruby %}
+
+<?php 
+#/* 
+#php 从zip压缩文件中提取文件 
+#*/
+$zip = new ZipArchive; 
+    
+if ($zip->open('jQuery五屏上下滚动焦点图代码.zip') === TRUE) {
+    #中文文件名要使用ANSI编码的文件格式 
+    $zip->extractTo('foldername');#提取全部文件 
+    $zip->extractTo('/my/destination/dir/', array('pear_item.gif', 'testfromfile.php'));#提取部分文件 
+    $zip->close(); 
+    echo 'ok'; 
+} else { 
+    echo 'failed'; 
+} 
+?>
+
+{% endhighlight %}
+
+{% highlight ruby %}
+
+<?php 
+#/* 
+#http://www.manongjc.com/article/1341.html
+#php 从一个zip压缩文件中删除文件 
+#*/
+$zip = new ZipArchive; 
+if ($zip->open('ajaxupload.zip') === TRUE) { 
+    $zip->deleteName('file.txt');#删除文件 
+    $zip->deleteName('testDir/');#删除文件夹 
+    $zip->close(); 
+    echo 'ok'; 
+} else { 
+    echo 'failed'; 
+} 
+?>
+
+{% endhighlight %}
+
+{% highlight ruby %}
+
+<?php 
+#/* 
+#http://www.manongjc.com/article/1342.html
+#php 添加一个文件到zip压缩文件中 
+#*/
+$zip = new ZipArchive; 
+    
+if ($zip->open('ajaxupload.zip') === TRUE) {
+    #ajaxupload.zip 是已经存在的zip文件，注意中文文件名要注意编码问题 
+    $zip->addFile('33.xml');#添加新的文件 
+    $zip->close(); 
+    echo 'ok'; 
+} else { 
+    echo 'failed'; 
+} 
+?>
+
+{% endhighlight %}

@@ -1,0 +1,169 @@
+---
+layout:     post
+title:      "php如何防止图片盗用/盗链的两种方法  「转」"
+subtitle:   "How to prevent picture theft/PHP hotlinking two methods  "
+date:       2014-4-20
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/dao.jpg"
+tags:
+    - PHP
+    - 优化
+    - 安全
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+如今的互联网，采集网站非常多，很多网站都喜欢盗链/盗用别人网站的图片，这样不仅侵犯网权，还导致被盗链的网站消耗大量的流量，给服务器造成比较大的压力，本文章向大家介绍php如何防止图片盗用/盗链的两种方法，需要的朋友可以参考一下。
+
+图片防盗链有什么用? 防止其它网站盗用你的图片，浪费你宝贵的流量。本文章向大家介绍php防止图片盗用/盗链的两种方法
+
+    1、Apache图片重定向方法
+    2、设置images目录不充许http访问
+
+### Apache服务器下防止图片盗链的办法
+
+如果你的网站以图片为主，哪天发现月底没到流量就快用光了，那就可以利用图片转向，在不修改网页的前提下，把图片下载请求转向到其它空间(比如试用主机)，临时过渡。
+
+下面开始讲解，比如你的图片都在img目录下，那就在该目录下放一个名为 .htaccess 的文件，内容如下：
+
+{% highlight ruby %}
+
+RewriteEngine on
+ 
+RewriteCond %{HTTP_REFERER} !^$ [NC]
+ 
+RewriteCond %{HTTP_REFERER} !simcole.cn [NC]
+ 
+RewriteCond %{HTTP_REFERER} !zhuaxia.com [NC]
+ 
+RewriteCond %{HTTP_REFERER} !google.com [NC]
+ 
+RewriteCond %{HTTP_REFERER} !baidu.com [NC]
+ 
+RewriteCond %{HTTP_REFERER} !bloglines.com [NC]
+
+RewriteRule .(jpg|gif|png|bmp|swf|jpeg) /image/replace.gif [R,NC,L]
+ 
+RewriteRule ^(.*)$ http://image.simcole.cn/image/$1 [L]
+
+{% endhighlight %}
+
+大概解释下：
+
+{% highlight ruby %}
+
+RewriteCond %{HTTP_REFERER} !^$ [NC]
+ 
+RewriteCond %{HTTP_REFERER} !simcole.cn [NC]
+ 
+RewriteCond %{HTTP_REFERER} !zhuaxia.com [NC]
+ 
+RewriteCond %{HTTP_REFERER} !google.com [NC]
+
+RewriteCond %{HTTP_REFERER} !baidu.com [NC]
+ 
+RewriteCond %{HTTP_REFERER} !bloglines.com [NC]
+  
+{% endhighlight %}
+
+这部分是判断是否盗链，如果以上条件都成立(即访问图片的请求，既不是直接输入网址，也不是来自simcole.cn，也不是来自zhuaxia.com，也不是来自google.com，也不是来自baidu.com，也不是来自bloglines.com 的话)，就执行下列转向：
+
+{% highlight ruby %}
+
+RewriteRule .(jpg|gif|png|bmp|swf|jpeg) /image/replace.gif [R,NC,L]
+  
+{% endhighlight %}
+
+意思是让所有盗链 img 目录下 jpg、gif、png、bmp、swf、jpeg 文件的网页，显示的图片都用 image 目录下的 replace.gif 图片替换掉。注意替换显示的图片不要放在设置防盗链的 img 目录下。如果照上面的规则判断出图片请求不是盗链的，就执行以下转向：
+
+{% highlight ruby %}
+
+RewriteRule ^(.*)$ http://image.simcole.cn/image/$1 [L]
+  
+{% endhighlight %}
+
+意思是对 img 目录下所有的请求都转向到目标服务器，比如有个图片原来的 url 是 http://www.bebecn.com/img/girl.jpg ，现在就会转到 http://image.bebecn.com/image/girl.jpg 去。当然了你得先把原服务器 img 目录下的文件统统拷贝到临时服务器的 image 目录下，转向才会真正可用。起到的效果就是把原服务器图片下载所占用的流量统统省下，让临时服务器来承受了.
+
+ 
+### 设置images目录不充许http访问
+
+把images目录设置成不充许http访问（把图片目录的：读取、目录浏览 两个权限去掉）。
+用一个PHP文件，直接用file函数读取这个图片。在这个PHP文件里进行权限控制。
+apache环境中，在你的图片目录中加上下面这个文件即可。
+
+文件名 .htaccess
+文件内容如下
+
+{% highlight ruby %}
+
+# options the .htaccess files in directories can override.
+# Edit apache/conf/httpd.conf to AllowOverride in .htaccess
+# AllowOverride AuthConfig
+# Stop the directory list from being shown
+Options -Indexes
+# Controls who can get stuff from this server.
+Order Deny,Allow
+Deny from all
+Allow from localhost
+  
+{% endhighlight %}
+
+其他web环境如iss，nginx也类似。
+
+{% highlight ruby %}
+
+class imgdata{
+public $imgsrc;
+public $imgdata;
+public $imgform;
+public function getdir($source){
+$this->imgsrc = $source;
+}
+public function img2data(){
+$this->_imgfrom($this->imgsrc);
+return $this->imgdata=fread(fopen($this->imgsrc,'rb'),filesize($this->imgsrc));
+}
+public function data2img(){
+header(“content-type:$this->imgform”);
+echo $this->imgdata;
+#echo $this->imgform;
+#imagecreatefromstring($this->imgdata);
+}
+public function _imgfrom($imgsrc){
+$info=getimagesize($imgsrc);
+#var_dump($info);
+
+return $this->imgform = $info['mime'];
+}
+}
+$n = new imgdata;
+$n -> getdir(“1.jpg”); #图片路径，一般存储在数据库里，用户无法获取真实路径,可根据图片ID来获取
+$n -> img2data();
+$n -> data2img();
+  
+{% endhighlight %}
+
+这段代码是读取图片，然后直接输出给浏览器，在读取和输出之前，进行用户权限判断。
+这里说的PHP读取图片，不是指读取路径，而是指读取图片的内容，然后通过
+Header();输入图片类型，比如 gif png jpg等，下面输出图片的内容，所以用到了fread()
+实际上，你看到 image.php?id=100 就是显示这张图片在浏览器上，而你查看源文件，看到的不会是图片的路径，而是乱码似的图片内容。
+
+类似于qq空间的加密相册，只有输入密码才能访问，并且直接在浏览器输入 加密相册中的相片地址也是无法访问。我目前的想法是 图片的地址是一个php文件，通过 php 验证权限 ，读取图片，并输出，不知道除了这样的方法还有更简单高效的做法没有？比如生成临时的浏览地址，使用一些 nginx 的一些防盗链插件？
+你可以利用ngx_http_auth_basic_module来完成。
+
+修改配置文件
+
+{% highlight ruby %}
+
+location / {
+root /usr/local/nginx/html;
+auth_basic “Auth”;
+auth_basic_user_file /usr/local/nginx/conf/htpasswd;
+index index.php index.htm;
+}
+  
+{% endhighlight %}
+
+auth_basic “Auth”中的Auth是弹出框（输入用户名和密码）的标题
+auth_basic_user_file /usr/local/nginx/conf/htpasswd; 中的/usr/local/nginx/conf/htpasswd是保存密码的文件

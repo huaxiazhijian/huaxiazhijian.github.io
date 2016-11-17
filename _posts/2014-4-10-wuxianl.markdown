@@ -1,0 +1,207 @@
+---
+layout:     post
+title:      "PHP实现无限分类  「转」"
+subtitle:   "PHP implementation infinite classification  "
+date:       2014-4-1
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/wu.jpg"
+tags:
+    - PHP
+    - 无限极分类
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+无限级分类是一种设计技巧，在开发中经常使用，例如：网站目录、部门结构、文章分类。笔者觉得它在对于设计表的层级结构上面发挥很大的作用，比如大家在一些平台上面，填写邀请人，它就是一种上下级的关系，上级会有多个下级，下级又会有自己的分支，大多数都是利用递归的思想去实现。话不多说，首先来温故一下递归的实现。
+
+递归（程序调用自身的编程技巧）：
+
+1、$_GLOBALS[result]
+
+2、static $result
+
+3、参数引用&
+
+举例：遍历1-10
+
+{% highlight ruby %}
+
+    #1
+    $i=0;
+    function deeploop( $i ){
+        global $i;
+        $i++;
+        echo $i;
+        if( $i<10 ){
+            deeploop($i);
+        }
+    } 
+
+{% endhighlight %}
+
+{% highlight ruby %}
+
+     #2
+    function deeploop(  ){
+        static $i=0;
+        $i++;
+        echo $i;
+        if( $i<10 ){
+            deeploop($i);
+        }
+    }
+
+{% endhighlight %}
+
+{% highlight ruby %}
+
+     #3
+    function deeploop( &$i=0 ){
+        $i++;
+        echo $i;
+        if( $i<10 ){
+            deeploop($i);
+        }
+    }
+
+{% endhighlight %}
+
+无限分类实现：
+    
+    1、表设计设置父id 顶级父id设为0   建立族谱树；每一个分类都需记录它的父级id。
+    
+        id pid catename cateorder createtime  （ 主键id，父id，分类name，分类排序，创建时间）
+        
+        举例：网站的分类目录结构；餐饮的分类结构；评论的结构
+    
+    2、全路径无限分类（以一个字段将所有父级id按顺序记录下来）
+    
+        id path catename cateorder createtime  （ 主键id,逗号分隔的顺序排列父id，分类name，分类排序，创建时间）
+
+优缺点：
+
+    全路径查询方便；增加，移动分类时数据维护稍显复杂；
+   
+举例：网站目录
+
+分类表：
+
+{% highlight ruby %}
+
+      #父级Id递归法
+            CREATE TABLE `deepcate`(
+                `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                `Pid` int(11) NOT NULL DEFAULT 0,
+                `catename` char(25) NOT NULL,
+                `cateorder` int(6) ,
+                `createtime` date
+            )ENGINE=INNODB default CHARSET=utf8;
+        
+            
+            #数据
+            INSERT INTO `deepcate` VALUES(1,0,'图片',null,'2016-11-01'),
+                                        ( 2,1,'美女',null,'2016-11-01'),
+                                        ( 3,1,'新闻',null,'2016-11-01'),
+                                        ( 4,2,'足球宝贝',null,'2016-11-01'),
+                                        ( 5,2,'日韩明星',null,'2016-11-01'),
+                                        ( 6,5,'美女写真',null,'2016-11-01');
+                                        
+            #全路径
+            CREATE TABLE `qljcate` (
+                `id` int(11) NOT NULL,
+                `path` char(255) ,
+                `catename` char(25) NOT NULL,
+                `cateorder` int(6),
+                `createtime` date
+            )ENGINE=INNODB default CHARSET=utf8;
+            
+            INSERT INTO `qljcate` VALUES( 1,null,'图片',null,'2016-11-01'),
+                                        ( 2,1,'美女图片',null,'2016-11-01'),
+                                        (3,1,2,'足球宝贝',null,'2016-11-01'),
+                                        (4,1,2,'日韩明星',null,'2016-11-01'),
+                                        (5,1,2,4,'美女写真',null,'2016-11-01');
+
+{% endhighlight %}
+
+获取图片所在的目录路径：
+
+{% highlight ruby %}
+
+    #父级Id实现法（数据库连接操作此处就不提及，提供思路，实现看个人调整）
+        function GetCatepath( $id,&$result=array() ){
+            $sql = "SELECT * FROM deepcate WHERE id={$id}";
+            $query = mysql_query( $sql );
+            $row = mysql_fetch_assoc( $query );
+            if( $row ){
+                $result[] = $row;
+                GetCatepath( $row['pid'],$result );
+            }
+            return $result;
+        }
+        
+        #全路径实现
+        function GetCatepath( $id ){
+            $sql = "SELECT * FROM qljcate WHERE id in (select contact(path,',',id) from qljcate where id={$id}) ORDER BY id asc";
+            $query = mysql_query( $sql );
+            $row = mysql_fetch_assoc( $query );
+            return $result;
+        
+        }
+
+{% endhighlight %}
+
+移动分类不能移到自己及其子类下面；删除分类 （只能删除最底层的分类，及不含子类的分类；换言之，只能从最底层删起）
+    
+1)、思考图片类型下所有的图片分类？
+
+{% highlight ruby %}
+
+     #pid 父级id实现法
+        function GetAllcate( $id,&$result=array() ){
+        $sql = "SELECT * FROM deepcate WHERE pid in ({$id})";
+            $query = mysql_query( $sql );
+            $row = mysql_fetch_assoc( $query );
+            if( mysql_num_rows($row)>0 )
+            {
+                $idlist = array();
+                while( $row ){
+                    $result[] = $row;
+                    $idlist[] = $row['id']; 
+                }
+                $id = implode(',',$idlist);
+                GetAllcate( $id,$result );
+            
+            }
+            $result = array_unique( $result );
+            return $result;
+        }
+
+{% endhighlight %}
+
+此类方法比较适用于查询所在父分类下所有的书籍、文章。。。当然，全路径可以直接获取，就不再此提出了。
+    
+2）、上述的这些查询操作数据库的操作可能过于频繁了，也是可以将数据全部查询出来（一般这种无限分类数据不会很多的），再用程序处理。
+如：工作中我们会遇到联动的情况，如地址的选择 省市区。
+
+{% highlight ruby %}
+
+     #获取树形结构数据 
+        function GetTree( $data=array() ){                                               #$data数据需处理以id为索引 
+            foreach( $data as $v){
+                $data[$v['id']] = $v;
+            }
+                    
+            $level0 = array();    #只需取出顶级的数据
+            foreach( $data as $val){
+                if( isset($data[$val['pid']]) ){
+                    $data[$val[$val['pid']['son']]][] = &$data[$val['id']];
+                }
+                else{
+                    $level0[] = &$data[$val['id']]; 
+                }
+            }
+            return $level0;
+        }
+
+{% endhighlight %}

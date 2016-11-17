@@ -1,0 +1,102 @@
+---
+layout:     post
+title:      "php的冒泡排序和快速排序  「转」"
+subtitle:   "PHP bubble sort and quick sort  "
+date:       2014-4-13
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/suanfa.jpg"
+tags:
+    - PHP
+    - 算法
+    - 冒泡排序
+    - 快速排序
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+1. 冒泡排序
+  #/*将第1个数与第2个数，比较如果小于第2个数，就交换位置，依次与这些数比较。
+   #*紧接着是 第2个数做同样的事，直到最后一个数为止
+   #*/
+
+{% highlight ruby %}
+
+#需求：将数组中元素，从大到小排列
+$a = array(11, 22, 44, 66, 99, 88);
+$sortArray = bubbleSort($a);
+print_r($sortArray);
+  
+
+ function bubbleSort($array)
+ {
+     $oldArray = $array;
+     $newArray = array();
+     $count = count($oldArray);
+     for($i = 0; $i < $count; $i++)
+     {
+         #初始化
+         $newArray[$i] = $oldArray[$i];
+
+         for($j = $i+1; $j < $count; $j++)
+         {
+             if($oldArray[$j] > $newArray[$i])
+             {
+                 $newArray[$i] = $oldArray[$j];
+                 #交换位置
+                 $tmp = $oldArray[$i];
+                 $oldArray[$i] = $oldArray[$j];
+                 $oldArray[$j] = $tmp;
+             }
+         }
+     }
+
+     return $newArray;
+ }
+
+{% endhighlight %}
+
+ 2. 快速排序
+  #/*以第一个数为基准，比这个数大的数放到左边的数组，比这个数大的数放到右边的数组，然后做递归操作。
+   #*最后将左边数组，这个数和右边数组做 数组的 array_merge操作就行了
+   #*/
+
+{% highlight ruby %}
+
+#需求：将数组中元素，从大到小排列
+$a = array(11, 22, 44, 66, 99, 88);
+$sortArray = bubbleSort($a);
+print_r($sortArray); 
+
+ function fastSort($oldArray)
+ {
+     $newArray = array();
+     $count = count($oldArray);
+     if($count <= 1) return $oldArray;
+     $stand = $oldArray[0];
+     #初始化
+     $left_array = array();
+     $right_array = array();
+     for($i = 1; $i < $count; $i++)
+     {
+         if($oldArray[$i] > $stand)
+         {
+            $left_array[] = $oldArray[$i];
+         }
+         else
+         {
+            $right_array[] = $oldArray[$i];
+         }
+
+     }
+
+     #递归调用
+     $left_array = fastSort($left_array);
+     $right_array = fastSort($right_array);
+     
+     #也可循环放入新数组中
+     $newArray = array_merge($left_array, array($stand), $right_array);
+     return $newArray;
+ }
+ 
+ {% endhighlight %} 
