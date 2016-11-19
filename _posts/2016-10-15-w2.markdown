@@ -1,0 +1,84 @@
+---
+layout:     post
+title:      "微信公众平台开发入门教程（二）「转」"
+subtitle:   "WeChat public platform development introductory tutorial（二） "
+date:       2016-10-15
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/w2.jpg"
+tags:
+    - 微信开发
+    - 教程
+    - 转载
+---
+	
+> 下滑这里查看更多内容
+
+
+### 第二章 启用开发模式
+
+## 微信公众平台开发模式
+
+高级功能
+
+微信公众平台地址：https://mp.weixin.qq.com 
+
+登录微信公众平台后台，在左侧列表中最下方，找到“ 基本配置 ”，点击进入
+
+<img src="../../../../img/blog/2014/weixinkaifa2/1.png" alt="">
+进入服务器配置填写框。
+<img src="../../../../img/blog/2014/weixinkaifa2/2.jpg" alt="">
+点击“修改配置”按钮
+<img src="../../../../img/blog/2014/weixinkaifa2/3.jpg" alt="">
+此处的URL为上篇中介绍的云应用的域名，而Token在index.php中定义为weixin。EncodingAESKey则不用填，点击“随机生成”让自动生成一个，消息加解密方式选择“明文模式”，然后点击“提交”按钮。
+<img src="../../../../img/blog/2014/weixinkaifa2/4.jpg" alt="">
+在弹出的提示框中，点击“确定”
+<img src="../../../../img/blog/2014/weixinkaifa2/5.jpg" alt="">
+配置修改后如图所示，再点击“启用”按钮
+<img src="../../../../img/blog/2014/weixinkaifa2/6.jpg" alt="">
+询问“是否确定开启服务器配置”，点击“确定”
+
+如果提示“token验证失败”，可以先重次几次，微信服务器有时候不稳定。另外新浪SAE要求进行实名认证，请先上传身份证进行实名认证并通过审核后再试！
+
+如果还是失败，请先用微信调试器测试一下url和token是否正确，点此查看详细测试方法。
+<img src="../../../../img/blog/2014/weixinkaifa2/7.jpg" alt="">
+成功启用后如图。
+
+恭喜，你成功启用开发模式。
+
+ 
+
+自动回复
+
+在上面的例子中，实现了一个发送“?”就能回复当前时间的功能。
+效果如下：
+<img src="../../../../img/blog/2014/weixinkaifa2/8.png" alt="">
+至此，你的微信公众平台账号已经实现自动回复了。
+
+
+### 第三章 常用消息类型接收与发送
+
+ 
+
+关注公众账号下载扩展型代码
+
+微信扫描下列二维码，然后回复“入门教程代码”，或查看到扩展型代码的完整地址。 
+<img src="../../../../img/blog/2014/weixinkaifa2/8.jpg" alt="">
+<img src="../../../../img/blog/2014/weixinkaifa2/9.png" alt="">
+
+将上述消息复制后，通过 手机版微信发给电脑版微信 或 手机版QQ发给电脑版QQ 的方式，将下载地址转到电脑上，并下载其中的压缩文件。
+
+然后通过前面章节同样的方式，上传到新浪SAE应用中。
+
+然后在你的公众账号中分别回复下列文字
+
+文本 表情 单图文 多图文 音乐
+<img src="../../../../img/blog/2014/weixinkaifa2/10png.png" alt="">
+<img src="../../../../img/blog/2014/weixinkaifa2/11.png" alt="">
+<img src="../../../../img/blog/2014/weixinkaifa2/12.png" alt="">
+或者发送以下类型的消息：语音 图片 小视频 我的收藏 位置
+<img src="../../../../img/blog/2014/weixinkaifa2/13.png" alt="">
+<img src="../../../../img/blog/2014/weixinkaifa2/14.png" alt="">
+你将体验到微信公众账号中最常见的接收消息及发送消息的类型。
+
+
+

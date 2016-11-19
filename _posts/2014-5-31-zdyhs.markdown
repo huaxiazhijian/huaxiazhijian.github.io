@@ -1,0 +1,171 @@
+---
+layout:     post
+title:      "PHP自定义函数「转」"
+subtitle:   "PHP custom function    "
+date:       2014-5-31
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/zdyhs.jpg"
+tags:
+    - PHP
+    - 扩展名
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+像数学中的函数一样，y=f(x)是函数基本的表达形式，x可看做是参数，y可看做是返回值，即函数定义就是一个被命名的、独立的代码段，它执行特定的任务，并可能给调用它的程序返回一个值。
+
+### 自定义函数
+
+## 函数的声明
+
+在编写程序的过程中，我们会经常碰到某些功能模块在PHP中没有提供系统函数，这样就需要我们自己定义函数，即自定义函数，自定义函数的规则如下：
+
+- 每个函数的第一行都是函数头，由声明函数的关键字function、函数名和参数列表三部分组成。
+- 每个自定义函数都必须使用function关键字声明。
+- 函数名可以代表整个函数，可以将函数命名为任何名称，只要遵循变量名的命名规则即可。但函数名称必须唯一，且不能与系统函数重名。
+- 声明函数时函数名后面的花括号也是必须有的，在花括号中表明了一组可以接受的参数列表，参数就是声明的变量，然后在调用函数时传递给它值。参数列表可以没有，也可以有—个或多个参数，多个参数使用逗号分隔。
+- 函数体位于函数头后面，用花括号括起来。函数被调用后，执行到retun语句或最外面的花括号后结束，返回到调用的程序。
+- 使用关键字return可以从函数中返回一个值，然后返回到调用程序处继续执行。
+
+## Demo
+
+{% highlight ruby %}
+
+<?php 
+    #/* 将使用双层for循环输出表格的代码声明为函数，函数名为table */
+    function table() {                              
+        echo "<table align='center' border='1' width='600'>";           
+        for($out=0; $out < 10; $out++ ) {       
+            $bgcolor = $out%2 == 0 ? "red" : "blue";#各行换背景色            
+            echo "<tr bgcolor=".$bgcolor.">"; 
+            for($in=0; $in <10; $in++) {    
+                echo "<td>".($out*10+$in)."</td>";    
+            }
+            echo "</tr>";    
+        }
+        echo "</table>";
+    } 
+?>
+
+{% endhighlight %}
+
+### 函数的调用
+
+不管是自定义的函数还是系统函数，如果函数不被调用，就不会执行。函数被调用后开始执行函数体中的代码，执行完毕返回到调用的位置继续向下执行。调用规则如下：
+
+- 通过函数名称去调用函数。
+- 如果函数有参数列表，还可以通过函数名后面的圆括号传入对应的值给参数，在函数体中使用参数来改变函数内部代码的执行行为。
+- 如果函数有返回值，当函数执行完毕时就会将return后面的值返回到调用函数的位置处。
+
+## Demo
+
+{% highlight ruby %}
+
+<?php 
+    #/* 将使用双层for循环输出表格的代码声明为函数，函数名为table */
+    function table() {                              
+        echo "<table align='center' border='1' width='600'>";           
+        for($out=0; $out < 10; $out++ ) {       
+            $bgcolor = $out%2 == 0 ? "red" : "blue";#各行换背景色            
+            echo "<tr bgcolor=".$bgcolor.">"; 
+            for($in=0; $in <10; $in++) {    
+                echo "<td>".($out*10+$in)."</td>";    
+            }
+            echo "</tr>";    
+        }
+        echo "</table>";
+    } 
+?>  
+
+<?php 
+table();
+?>    
+
+{% endhighlight %}
+
+### 函数的参数
+
+参数列表是由零个、一个或多个参数组成的。每个参数是一个表达式，用逗号分隔。对于有参函数，在PHP脚本程序中和被调用函数之间有数据传递关系。定义函数时函数名后面括号内的表达式称为形式参数（简称“形参”），被调用函数名后面括号中的表达式称为实际参数（简称“实参”），实参和形参需要接顺序对应传递数据。如果函数没有参数列表，函数执行的任务就是固定的，用户在调用函数时不能改变函数内部的一些执行行为。
+
+## Demo
+
+{% highlight ruby %}
+
+<?php 
+    #/**
+        #自定义函数table()时，声明三个参数，参数之间使用逗号分隔
+        #@param  string  $tableName  需要一个字符串类型的表名
+        #@param  int     $rows       需要一个整型数值设置表格的行数
+        #@param  int     $cols       需要另一个整型值设置表格的列数
+    #*/
+    function table( $tableName, $rows, $cols ) {                    
+        echo "<table align='center' border='1' width='600'>";       
+        echo "<caption><h1> $tableName </h1></caption>";            
+    
+        for($out=0; $out < $rows; $out++ ) {    #使用第二个参数$rows指定表行数
+            $bgcolor = $out%2 == 0 ? "red" : "blue";            
+            echo "<tr bgcolor=".$bgcolor.">"; 
+
+            for($in=0; $in < $cols; $in++) {    #使用第三个参数$cols指定表列数
+                echo "<td>".($out*$cols+$in)."</td>";    
+            }
+
+            echo "</tr>";    
+        }
+        echo "</table>";
+    } 
+?>  
+
+<?php 
+table("千度的表格",10,10);
+?> 
+
+{% endhighlight %}
+
+函数的返回值
+
+函数的返回值是函数执行的结果，调用函数的脚本程序不能直接使用函数体里面的信息，但可以通过关键字return向调用者传递数据。return语句注意点如下：
+
+- return语句可以向函数调用者返回函数体中任意执行结果值。
+- 在函数体中如果执行了return语句，它后面的语句就不会被执行。
+
+## Demo
+
+{% highlight ruby %}
+
+<?php 
+    #/**
+        #自定义函数table()时，声明三个参数，参数之间使用逗号分隔
+        #@param  string  $tableName  需要一个字符串类型的表名
+        #@param  int     $rows       需要一个整型数值设置表格的行数
+        #@param  int     $cols       需要另一个整型值设置表格的列数
+    #*/
+    function table( $tableName, $rows, $cols ) {
+        $returnStr="这是返回的字符串";
+        echo "<table align='center' border='1' width='600'>";       
+        echo "<caption><h1> $tableName </h1></caption>";            
+    
+        for($out=0; $out < $rows; $out++ ) {    #使用第二个参数$rows指定表行数
+            $bgcolor = $out%2 == 0 ? "red" : "blue";            
+            echo "<tr bgcolor=".$bgcolor.">"; 
+
+            for($in=0; $in < $cols; $in++) {    #使用第三个参数$cols指定表列数
+                echo "<td>".($out*$cols+$in)."</td>";    
+            }
+
+            echo "</tr>";    
+        }
+        echo "</table>";
+        return $returnStr;
+    } 
+?>  
+
+<?php 
+echo table("千度的表格",10,10);
+?> 
+
+{% endhighlight %}
+
+
+

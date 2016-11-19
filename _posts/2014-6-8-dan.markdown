@@ -1,0 +1,89 @@
+---
+layout:     post
+title:      "单例模式「原」"
+subtitle:   "The singleton pattern   "
+date:       2014-6-8
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/wx.jpg"
+tags:
+    - PHP
+    - 单例模式
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+### 什么是单例模式？
+    在整个应用中通过这个类只能实例化一个对象实例的设计模式
+
+ 
+
+### 模式分类？
+
+在所有模式设计中，有三种基础设计模式，单例模式，工厂模式，注册树模式，其他模式往往基于这几种模式，今天带来的是单例模式。
+
+
+### 为什么要用单例模式？
+    1。php常常和数据库打交道，如果在应用中频繁建立连接对象，进行new操作的话，会消耗大量的系统内存资源。（节省资源开销）
+    2。在团队合作项目中，单例模式可以有效避免不同程序员new自己的对象时，造成人为的系统消耗。（节省资源开销）
+
+
+### 实现方式
+
+第一步：封装构造方法  private  __construct( ) { }
+             原因：   构造函数在 new 出对象的时候第一个调用的方法  构造函数被申明为private或者protected这注定无法通过new的方法创建实例对象了。
+ 
+
+第二步：   通过类内的方法来创建对象实例。   static Single(){ }
+           原因：我们往往往往是创建了对象后才调用对象的方法，而此时需要调用类里面的方法来创建对象。不受是否创建对象影响都能调用的方法的解决方案毋庸置疑那就是利用关键字--static
+                   
+
+ 第三步：定义一个封装的静态变量    private static $instance
+           原因：把实例化的唯一对象放在这个变量里面存起来
+            
+第四步（加1曲）：私有化克隆的魔术方法：__c l o n e ()；
+            原因：对于一个类的对象，如果使用“clone运算符”，就会克隆出一个跟当前对象完全一样的新对象出来，并且：此时这个新对象还会自动调用该类中的魔术方法：_ _c l o n e ()；只要其中有该方法；
+			
+### 代码演示：
+			
+{% highlight ruby %}
+			
+<?php
+  
+  class Sing {
+      
+      #//第三步：定义一个变量
+    private static $instance= null;
+  
+      #//第一步：封装构造函数
+      private function  __construct(){
+         
+     }
+ 
+     #//第二步：使用类名调用这个类创建对象实例
+     static  function getSingle(){
+         if( !(self::$instance  instanceof self) ){    #//instanceof判断一个对象是否是某个类的实例
+         self::$instance = new self();               #//用变量来存储实例化出来的对象
+     }
+         return self::$instance;
+     }
+ 
+ 
+     #//第四步：禁止克隆实例化出来的对象
+     private function __clone(){ }
+ 
+ }
+ 
+  $danli = Sing::getSingle();
+  var_dump($danli);    #//输出   object(Sing)#1 (0) { }
+  $danli2 = Sing::getSingle();   
+  var_dump($danli2);   #//输出   object(Sing)#1 (0) { }
+ 
+ $obj3 = clone $danli;   #//此处禁止克隆单例对象实例
+ var_dump($obj3);  #//Call to private Sing::__clone() from context '' in 错误行号
+ 
+ 
+ ?>
+			
+{% endhighlight %}
+			

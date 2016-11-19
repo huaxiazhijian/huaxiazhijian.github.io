@@ -1,0 +1,187 @@
+---
+layout:     post
+title:      "memcache使用方法测试「原」"
+subtitle:   "Memcache usage test   "
+date:       2015-4-30
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2015/mem.jpg"
+tags:
+    - PHP
+    - memcache
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+{% highlight ruby %}
+
+
+<?php
+ 
+//php操作memcache的使用测试总结--学习
+ 
+//1 Memcache::connect;
+   //$memcache = new Memcache;
+   //$memcache->connect('127.0.0.1',11211) or die("链接失败!");
+ 
+ 
+//2 Memcache::pconnect; 长链接
+   //$memcache = new Memcache;
+   //$ret = $memcache->pconnect('127.0.0.1',11211) or die("链接失败");
+   //var_dump($ret);
+ 
+ 
+//3 Memcache::close; 关闭对象（对常链接不起作用）
+    /*$memcache = new Memcache;
+    $memcache->connect('127.0.0.1',11211) or die("链接失败!");
+    $result = $memcache->close();
+    var_dump($result);*/
+ 
+//4 Memcache::addServer; 向对象添加一个服务器
+    /*$mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211,true, 1, 1, 15, true);
+    $is_set = $mem->set('key1','中华人民共和国');
+    var_dump($is_set);*/
+ 
+ 
+    /*$mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211,true, 1, 1, -1, false);
+    $is_set = $mem->set('key1','中华人民共和国');
+    var_dump($is_set);*/
+ 
+ 
+//5 Memcache::add 添加一个要缓存的数据如果作为这个缓存的数据在键在服务器上还不存在的情况下
+ 
+    /*$mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $is_set = $mem->add('key2','中华人民共和国', false, 60);
+    var_dump($is_set);*/
+ 
+//6 Memcache::replace() 替换一个指定已存在key的缓存变量内容
+    /*$mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $mem->add('key2','中华人民共和国', false, 60);
+    $is_set = $mem->replace('key2','台湾人民共和国',false,60);
+    var_dump($is_set);*/
+ 
+ 
+//7 Memcace::set 设置一个指定key的缓存变量内容
+ 
+    /*
+    $mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $mem->set('key2','中华人民共和国', false, 60);
+    $key2 = $mem->get('key2');
+    echo $key2."<BR>";
+    $mem->replace('key2','台湾人民',false,60);
+    $key2 = $mem->get('key2');
+    echo $key2;*/
+ 
+//8 Memcache::get() 获取某个key的变量缓存值
+ 
+    /*
+    $mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $mem->set('key2','中华人民共和国', false, 60);
+    $mem->set('key1','台湾人民',false,60);
+    $arr = $mem->get(array('key1','key2'));
+    var_dump($arr);
+    */
+ 
+//9 Memcache::delete 删除某个变量的缓存
+    /*
+    $mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $mem->set('key2','中华人民共和国', false, 60);
+    $mem->set('key1','台湾人民',false,60);
+    $mem->delete('key2');
+ 
+    $arr = $mem->get(array('key1','key2'));
+    var_dump($arr);
+    */
+ 
+//10 Memcach::flush 清空所缓存内容，不是真的删除缓存的内容，只是使所有变量的缓存过期，使内存中的内容被重写
+    /*
+    $mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $mem->flush();
+    */
+ 
+//11 Memcach::getExtendedStats 获取所有服务器扩展静态信息
+    /*
+    $mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $stats = $mem->getExtendedStats();
+    var_dump($stats);
+    */
+ 
+//12 Memcache:getStats; 获取最后添加服务器静态信息
+ 
+ 
+//13 Memcache::getServerStatus 通过输入的host及port来获取相应的服务器信息
+    /*
+    $mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $info = $mem->getServerStatus('localhost');
+    var_dump($info);
+    */
+    //返回值
+    //返回服务器状态，0为失败，其他情况返回非0数字
+ 
+  
+ //14 Memcache::getVersion() 获取服务器的版本号信息
+    /*
+    $mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $version = $mem->getVersion();
+    echo $version;
+    */
+ 
+ 
+ 
+ //15 Memcache::setCompressThreshold 设置压缩级根
+      //bool Memcache::setCompressThreshold ( int $threshold [, float $min_savings ] )
+      //threshold 设置控制自动压缩的变量长度的最小值
+      //min_saving 指定的最低压缩比率，值必须介于 0 - 1 之间，默认为 0.2 代表 20% 的压缩比率
+      //$mem->setCompressThreshold(20000,0.2);
+ 
+//16  Memcache::setServerParams   Memcache version 2.1.0后增加的函数，运行时设置服务器参数
+ 
+ 
+//17 Memcache::increment  给指定kye的缓存变量一个增值，如查该变量不是数字时不会被转化为数字
+    //这个增值将会加到该变量原有的数字之上，变量不存在不会新增变量
+    //对于压缩存储的变量不要使用本函数因为相应的取值方法会失败
+ 
+    /*
+    $mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $mem->set('key2',11, false, 60);
+    $key  = $mem->get('key2');
+    echo $key."<BR><BR>";
+ 
+    $mem->increment('key2',3);
+    $key = $mem->get('key2');
+    echo $key;
+    */
+ 
+ 
+ //18 Memcache::decrement
+    //给指定key的缓存变量一个递减值，与increment操作类拟，将在原有变量基础上减去这个值，该项的值将会在转化为数字后减去，新项的值不会小于0，对于压缩的变量不要使用本函数因为相应的取值方法会失败
+ 
+    /*$mem = new Memcache;
+    $is_add = $mem->addServer('localhost',11211);
+    $mem->set('key2',11, false, 60);
+    $key  = $mem->get('key2');
+    echo $key."<BR><BR>";
+    $mem->decrement('key2',3);
+    $key = $mem->get('key2');
+    echo $key;*/
+ 
+ 
+ 
+ //19 Memcache_debug
+      //设置memecache的调用器是否开启，值为true或者false，受影响于php这安装时是否使用了 --enable-debug选项，如果使用了该函数才会返回true,其他情况将始终返回false
+?>
+
+
+{% endhighlight %}

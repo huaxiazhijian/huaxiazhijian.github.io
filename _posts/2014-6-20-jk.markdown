@@ -1,0 +1,99 @@
+---
+layout:     post
+title:      "PHP中抽象类，接口定义「原」"
+subtitle:   "The abstract class in PHP, interface definition   "
+date:       2014-6-20
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/jk.jpg"
+tags:
+    - PHP
+    - 抽象类
+    - 接口
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+### 接口（interface）：
+
+接口就是为抽象而生的，相当于一个约定或规范，方便框架搭建，代码分工。
+
+它里面指定了抽象方法的名称和参数和成员常量，但不能包含任何的具体方法，变量.
+
+个人认为php是弱类型语言，强调的是灵活性。与java相比php里的接口对类型要求太松弛。不大好用，不推荐大量使用。
+
+　　1）接口中全部是抽象方法。（因为要用来给子类实现。所以都要是public或protected的。）
+
+　　2）接口中不能有具体方法，且只能有成员常量。
+
+　　3) 由于php和java c++等强类型语言不同，php是弱类型且动态类型的本身就不指定返回类型，参数的数据类型除四种基本类型不能指定外也可写可不写，所以对方法返回值和参数的类型无要求。
+
+　　4）一个类可以实现多个接口。用法: implements关键字后实现多个接口用逗号隔开。
+
+{% highlight ruby %}
+
+interface Car {
+
+　　　　 const name = "车子";
+
+        public function run($speed=400,$time=300);
+
+}
+
+class Xiali implements Car {
+　　　　public function run($s=100，$t=200){#//参数个数必须相同
+              echo '哈哈 我会跑';
+              return 'abc';
+       }
+       
+       public function fly() {
+               echo '哈哈我会飞';
+       }
+}
+
+{% endhighlight %}
+
+### 抽象类（abstract class）：
+
+     作用和接口一样，都是为了规范子类的功能，只是比接口多包含了具体的内容。
+
+　　1）包含至少一个抽象方法（abstract function）的类（换言之，任何类只要有了一个或以上的抽象方法，这个类就必须是抽象类。）
+
+　　2）抽象类和接口一样不能实例化。都叫抽象的了，还咋实例化，实例都是具体的。2333.
+
+　　3）小结：抽象类和普通类俩区别：1.至少包含一个抽象方法 2.不能实例化。别的都一样。
+
+　　4）用法：
+
+{% highlight ruby %}
+
+abstract class Father{
+        abstract function func1();#//至少一个抽象方法。
+            
+        public function func2(){#//具体方法随便写。
+                echo 'func2';
+                $this->func3();
+        }   
+        private function func3(){
+                echo '一个private方法';
+        }   
+}
+
+{% endhighlight %}
+
+实现继承到的抽象方法时
+
+{% highlight ruby %}
+
+#/**
+  #* 继承抽象类
+  #* 必须实现其所有抽象方法
+  #* 和普通一样，一个类也只能继承一个抽象类
+  #*/
+ class Son extends Father {
+     public function func1() {
+          echo '实现（重写）抽象方法。参数名个数必须相同'  
+     }
+ }
+
+{% endhighlight %}

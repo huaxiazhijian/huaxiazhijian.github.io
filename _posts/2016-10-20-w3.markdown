@@ -1,0 +1,534 @@
+---
+layout:     post
+title:      "微信公众平台开发入门教程（三）「转」"
+subtitle:   "WeChat public platform development introductory tutorial（三） "
+date:       2016-10-20
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/w3.jpg"
+tags:
+    - 微信开发
+    - 教程
+    - 转载
+---
+	
+> 下滑这里查看更多内容
+
+第四章 数据收发原理及消息数据格式
+
+ 
+
+★ 本章是理论部分，初学者会比较难以理解，不用太过追究。
+
+开发模式成为开发者时的消息校验原理
+
+在开发者首次提交验证申请时，微信服务器将发送GET请求到填写的URL上，并且带上四个参数（signature、timestamp、nonce、echostr），开发者通过对签名（即signature）的效验，来判断此条消息的真实性。
+
+此后，每次开发者接收用户消息的时候，微信也都会带上前面三个参数（signature、timestamp、nonce）访问开发者设置的URL，开发者依然通过对签名的效验判断此条消息的真实性。效验方式与首次提交验证申请一致。
+<img src="../../../../img/blog/2014/weixinkaifa3/101.png" alt="">
+开发者通过检验signature对请求进行校验（下面有校验方式）。若确认此次GET请求来自微信服务器，请原样返回echostr参数内容，则接入生效，成为开发者成功，否则接入失败。
+
+加密/校验流程如下：
+1. 将token、timestamp、nonce三个参数进行字典序排序
+2. 将三个参数字符串拼接成一个字符串进行sha1加密
+3. 开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
+
+启用接口是由代码中的checkSignature()函数来实现校验的。如果对这一原理难以理解，可以暂时不用深究，继续看下面。
+
+ 
+
+成为开发者后消息收发时的原理
+
+上一章节中图，当用户发送一个“?”时，系统回复了一个时间
+
+这一原理的消息流程图如下所示。
+<img src="../../../../img/blog/2014/weixinkaifa3/1.jpg" alt="">
+从上图可以看出，用户在发送一个?后，微信服务器将组装一个消息发送给我们自己的服务器，自己的服务器然后回复一个时间，并且将该时间也按一定的规则组装，回复给公众账号，公众账号再回复给用户，在这个收发过程中，发送方和接收方进行了调换(ToUserName和FromUserName值互换)，收发都是以xml格式在后台进行传输的，
+
+所以掌握各种消息类型的接收回复就是进行微信公众平台开发的基础！
+
+下面对前面所述的各种消息类型讲解其XML数据包的格式。
+
+ 
+
+各种收发消息的XML数据包分析
+
+接收消息
+
+1. 文本（包括表情）
+接收文本及表情
+<img src="../../../../img/blog/2014/weixinkaifa3/2.jpg" alt="">
+文字后台格式:
+
+{% highlight ruby %}
+
+<xml>
+ <ToUserName><![CDATA[gh_680bdefc8c5d]]></ToUserName>
+ <FromUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></FromUserName>
+ <CreateTime>1359028446</CreateTime>
+ <MsgType><![CDATA[text]]></MsgType>
+ <Content><![CDATA[测试文字]]></Content>
+ <MsgId>5836982729904121631</MsgId>
+</xml>
+
+{% endhighlight %}
+
+表情后台格式
+
+{% highlight ruby %}
+
+<xml><ToUserName><![CDATA[gh_680bdefc8c5d]]></ToUserName>
+<FromUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></FromUserName>
+<CreateTime>1359044526</CreateTime>
+<MsgType><![CDATA[text]]></MsgType>
+<Content><![CDATA[/::)/::~/::B/::|/:8-)]]></Content>
+<MsgId>5837051792978241864</MsgId>
+</xml>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+ToUserName 消息接收方微信号，一般为公众平台账号微信号
+FromUserName 消息发送方微信号
+CreateTime 消息创建时间
+MsgType 消息类型；文本消息为text
+Content 消息内容
+MsgId 消息ID号
+
+{% endhighlight %}
+
+可以看出，文本和表情的消息类型均为文本
+
+2. 图片
+接收图片
+
+<img src="../../../../img/blog/2014/weixinkaifa3/3.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby %}
+
+<xml><ToUserName><![CDATA[gh_680bdefc8c5d]]></ToUserName>
+<FromUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></FromUserName>
+<CreateTime>1359028479</CreateTime>
+<MsgType><![CDATA[image]]></MsgType>
+<PicUrl><![CDATA[http://mmbiz.qpic.cn/mmbiz/L4qjYtOibummHn90t1mnaibYiaR8ljyicF3MW7XX3BLp1qZgUb7CtZ0DxqYFI4uAQH1FWs3hUicpibjF0pOqLEQyDMlg/0]]></PicUrl>
+<MsgId>5836982871638042400</MsgId>
+<MediaId><![CDATA[PGKsO3LAgbVTsFYO7FGu51KUYa07D0C_Nozz2fn1z6VYtHOsF59PTFl0vagGxkVH]]></MediaId>
+</xml>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+ToUserName 消息接收方微信号，一般为公众平台账号微信号
+FromUserName 消息发送方微信号
+CreateTime 消息创建时间
+MsgType 消息类型；图片消息为image
+PicUrl 图片链接地址，可以用HTTP GET获取
+MsgId 消息ID号
+
+{% endhighlight %}
+
+3. 语音
+接收语音
+
+<img src="../../../../img/blog/2014/weixinkaifa3/4.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby%}
+
+<xml>
+    <ToUserName><![CDATA[gh_d035bb259cf5]]></ToUserName>
+    <FromUserName><![CDATA[owEUGj4BW8yeWRvyEERiVGKwAF1Q]]></FromUserName>
+    <CreateTime>1364883809</CreateTime>
+    <MsgType><![CDATA[voice]]></MsgType>
+    <MediaId><![CDATA[JfmCezZ3Cwp0FwUvMADwwhvp-XScuvpictubpw0c6ALyA8tj3HLU4PoXzMpIY72P]]></MediaId>
+    <Format><![CDATA[amr]]></Format>
+    <MsgId>5862131322594912688</MsgId>
+</xml>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+ToUserName 消息接收方微信号，一般为公众平台账号微信号
+FromUserName 消息发送方微信号
+CreateTime 消息创建时间
+MsgType 消息类型；语音消息为voice
+MediaId 媒体ID
+Format 语音格式，这里为amr
+MsgId 消息ID号
+
+{% endhighlight %}
+
+附：AMR接口简介
+全称Adaptive Multi-Rate，主要用于移动设备的音频，压缩比比较大，但相对其他的压缩格式质量比较差，由于多用于人声，通话，效果还是很不错的。
+
+4. 视频
+
+接收视频
+<img src="../../../../img/blog/2014/weixinkaifa3/5.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby %}
+
+xml><ToUserName><![CDATA[gh_680bdefc8c5d]]></ToUserName>
+<FromUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></FromUserName>
+<CreateTime>1359028186</CreateTime>
+<MsgType><![CDATA[video]]></MsgType>
+<MediaId><![CDATA[DBVFRIj29LB2hxuYpc0R6VLyxwgyCHZPbRj_IIs6YaGhutyXUKtFSDcSCPeoqUYr]]></MediaId>
+<ThumbMediaId><![CDATA[mxUJ5gcCeesJwx2T9qsk62YzIclCP_HnRdfTQcojlPeT2G9Q3d22UkSLyBFLZ01J]]></ThumbMediaId>
+<MsgId>5836981613212624665</MsgId>
+</xml>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+ToUserName 消息接收方微信号，一般为公众平台账号微信号
+FromUserName 消息发送方微信号
+CreateTime 消息创建时间
+MsgType 消息类型；视频消息为video
+MediaId 媒体ID
+ThumbMediaId 媒体缩略ID？
+MsgId 消息ID号
+
+{% endhighlight %}
+
+5. 位置
+
+接收位置
+
+<img src="../../../../img/blog/2014/weixinkaifa3/6.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby %}
+
+<xml>
+<ToUserName><![CDATA[gh_680bdefc8c5d]]></ToUserName>
+<FromUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></FromUserName>
+<CreateTime>1359036619</CreateTime>
+<MsgType><![CDATA[location]]></MsgType>
+<Location_X>22.539968</Location_X>
+<Location_Y>113.954980</Location_Y>
+<Scale>16</Scale>
+<Label><![CDATA[中国广东省深圳市南山区华侨城深南大道9789号 邮政编码: 518057]]></Label>
+<MsgId>5837017832671832047</MsgId>
+</xml>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+ ToUserName 消息接收方微信号，一般为公众平台账号微信号
+ FromUserName 消息发送方微信号
+ CreateTime 消息创建时间
+ MsgType 消息类型，地理位置为location
+ Location_X 地理位置纬度
+ Location_Y 地理位置经度
+ Scale 地图缩放大小
+ Label 地理位置信息
+ MsgId 消息ID号
+
+{% endhighlight %}
+
+6. 链接
+
+接收链接
+
+<img src="../../../../img/blog/2014/weixinkaifa3/7.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby %}
+
+<xml>
+<ToUserName><![CDATA[gh_680bdefc8c5d]]></ToUserName> 
+<FromUserName><![CDATA[oIDrpjl2LYdfTAM-oxDgB4XZcnc8]]></FromUserName> 
+<CreateTime>1359709372</CreateTime> 
+<MsgType><![CDATA[link]]></MsgType> 
+<Title><![CDATA[微信公众平台开发者的江湖]]></Title> 
+<Description><![CDATA[陈坤的微信公众号这段时间大火，大家..]]></Description> 
+<Url><![CDATA[http://israel.duapp.com/web/photo.php]]></Url> 
+<MsgId>5839907284805129867</MsgId> 
+</xml> 
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+  ToUserName 消息接收方微信号，一般为公众平台账号微信号
+ FromUserName 消息发送方微信号
+ CreateTime 消息创建时间
+ MsgType 消息类型，链接为link
+ Title 图文消息标题
+ Description 图文消息描述
+ Url 点击图文消息跳转链接
+ MsgId 消息ID号
+
+{% endhighlight %}
+
+回复消息
+
+只介绍三种格式的消息：文本、图文、音乐。其中图文消息包括单条图文消息和多条图文消息，展示方式有一点点不同。
+
+1. 文本消息格式
+回复文本
+
+<img src="../../../../img/blog/2014/weixinkaifa3/8.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby %}
+
+<xml>
+<ToUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></ToUserName>
+<FromUserName><![CDATA[gh_680bdefc8c5d]]></FromUserName>
+<CreateTime>1359036631</CreateTime>
+<MsgType><![CDATA[text]]></MsgType>
+<Content><![CDATA[【深圳】天气实况 温度：27℃ 湿度：59% 风速：东北风3级
+11月03日 周日 27℃~23℃ 小雨 东北风4-5级
+11月04日 周一 26℃~21℃ 阵雨 微风
+11月05日 周二 27℃~22℃ 阴 微风]]></Content>
+<FuncFlag>0</FuncFlag>
+</xml>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+   FromUserName 消息发送方
+ ToUserName 消息接收方
+ CreateTime 消息创建时间
+ MsgType 消息类型，文本消息必须填写text
+ Content 消息内容，大小限制在2048字节，字段为空为不合法请求
+ FuncFlag 星标字段
+
+{% endhighlight %}
+
+2. 图文消息格式
+2.1 单条图文消息
+回复单条图文
+
+<img src="../../../../img/blog/2014/weixinkaifa3/9.jpg" alt="">
+<img src="../../../../img/blog/2014/weixinkaifa3/10.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby %}
+
+<xml>
+    <ToUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></ToUserName>
+    <FromUserName><![CDATA[gh_680bdefc8c5d]]></FromUserName>
+    <CreateTime>1359011899</CreateTime>
+    <MsgType><![CDATA[news]]></MsgType>
+    <Content><![CDATA[]]></Content>
+    <ArticleCount>1</ArticleCount>
+    <Articles>
+        <item>
+            <Title><![CDATA[[苹果产品信息查询]]></Title>
+            <Description><![CDATA[序列号：USE IMEI NUMBER
+IMEI号：358031058974471
+设备名称：iPhone 5C
+设备颜色：
+设备容量：
+激活状态：已激活
+电话支持：未过期[2014-01-13]
+硬件保修：未过期[2014-10-14]
+生产工厂：中国]]>
+    </Description>
+            <PicUrl><![CDATA[http://www.fangbei.org/weixin/weather/icon/banner.jpg]]></PicUrl>
+            <Url><![CDATA[]]></Url>
+        </item>
+    </Articles>
+    <FuncFlag>0</FuncFlag>
+</xml>
+
+{% endhighlight %}
+
+复制代码
+
+2.2 多图文消息
+
+回复多图文
+
+<img src="../../../../img/blog/2014/weixinkaifa3/11.jpg" alt="">
+<img src="../../../../img/blog/2014/weixinkaifa3/12.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby %}
+
+<xml>
+    <ToUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></ToUserName>
+    <FromUserName><![CDATA[gh_680bdefc8c5d]]></FromUserName>
+    <CreateTime>1359011829</CreateTime>
+    <MsgType><![CDATA[news]]></MsgType>
+    <Content><![CDATA[]]></Content>
+    <ArticleCount>5</ArticleCount>
+    <Articles>
+        <item>
+            <Title><![CDATA[【深圳】天气实况 温度：3℃ 湿度：43﹪ 风速：西南风2级]]></Title>
+            <Description><![CDATA[]]></Description>
+<PicUrl><![CDATA[http://www.fangbei.org/weixin/weather/icon/banner.jpg]]></PicUrl>
+            <Url><![CDATA[]]></Url>
+        </item>
+        <item>
+            <Title><![CDATA[06月24日 周四 2℃~-7℃ 晴 北风3-4级转东南风小于3级]]></Title>
+            <Description><![CDATA[]]></Description>
+            <PicUrl><![CDATA[http://www.fangbei.org/weixin/weather/icon/d00.gif]]></PicUrl>
+            <Url><![CDATA[]]></Url>
+        </item>
+        <item>
+            <Title><![CDATA[06月25日 周五 -1℃~-8℃ 晴 东南风小于3级转东北风3-4级]]></Title>
+            <Description><![CDATA[]]></Description>
+    <PicUrl><![CDATA[http://www.fangbei.org/weixin/weather/icon/d00.gif]]></PicUrl>
+            <Url><![CDATA[]]></Url>
+        </item>
+        <item>
+            <Title><![CDATA[06月26日 周六 -1℃~-7℃ 多云 东北风3-4级转东南风小于3级]]></Title>
+            <Description><![CDATA[]]></Description>
+<PicUrl>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+FromUserName 消息发送方
+ ToUserName 消息接收方
+ CreateTime 消息创建时间
+ MsgType 消息类型，图文消息必须填写news
+ Content 消息内容，图文消息可填空
+ ArticleCount 图文消息个数，限制为10条以内
+ Articles 多条图文消息信息，默认第一个item为大图
+  Title 图文消息标题
+  Description 图文消息描述
+  PicUrl 图片链接，支持JPG、PNG格式，较好的效果为大图640*320，小图80*80
+  Url 点击图文消息跳转链接
+FuncFlag 星标字段
+
+{% endhighlight %}
+
+ 3. 音乐消息
+
+回复音乐消息
+
+<img src="../../../../img/blog/2014/weixinkaifa3/13.jpg" alt="">
+
+后台格式：
+
+{% highlight ruby %}
+
+<xml>
+    <ToUserName><![CDATA[ollB4jqgdO_cRnVXk_wRnSywgtQ8]]></ToUserName>
+    <FromUserName><![CDATA[gh_b629c48b653e]]></FromUserName>
+    <CreateTime>1372310544</CreateTime>
+    <MsgType><![CDATA[music]]></MsgType>
+    <Music>
+        <Title><![CDATA[最炫民族风]]></Title>
+        <Description><![CDATA[凤凰传奇]]></Description>
+        <MusicUrl><![CDATA[http://zj189.cn/zj/download/music/zxmzf.mp3]]></MusicUrl>
+        <HQMusicUrl><![CDATA[http://zj189.cn/zj/download/music/zxmzf.mp3]]></HQMusicUrl>
+    </Music>
+    <FuncFlag>0</FuncFlag>
+</xml>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+ToUserName     接收方帐号（收到的OpenID）
+FromUserName     开发者微信号
+CreateTime     消息创建时间
+MsgType          消息类型，此处为music
+    Title       音乐标题
+    Description 音乐描述
+    MusicUrl     音乐链接
+    HQMusicUrl     高质量音乐链接，WIFI环境优先使用该链接播放音乐
+FuncFlag     位0x0001被标志时，星标刚收到的消息。
+
+{% endhighlight %}
+
+事件消息类型
+
+目前用户在关注和取消关注，以及点击菜单的时候会自动向公众平台发送事件推送消息：
+
+1. 关注事件
+
+{% highlight ruby %}
+
+<xml>
+    <ToUserName><![CDATA[gh_b629c48b653e]]></ToUserName>
+    <FromUserName><![CDATA[ollB4jv7LA3tydjviJp5V9qTU_kA]]></FromUserName>
+    <CreateTime>1372307736</CreateTime>
+    <MsgType><![CDATA[event]]></MsgType>
+    <Event><![CDATA[subscribe]]></Event>
+    <EventKey><![CDATA[]]></EventKey>
+</xml>
+
+{% endhighlight %}
+
+2. 取消关注事件
+
+{% highlight ruby %}
+
+<xml>
+    <ToUserName><![CDATA[gh_b629c48b653e]]></ToUserName>
+    <FromUserName><![CDATA[ollB4jqgdO_cRnVXk_wRnSywgtQ8]]></FromUserName>
+    <CreateTime>1372309890</CreateTime>
+    <MsgType><![CDATA[event]]></MsgType>
+    <Event><![CDATA[unsubscribe]]></Event>
+    <EventKey><![CDATA[]]></EventKey>
+</xml>
+
+{% endhighlight %}
+
+3. 菜单点击事件
+
+{% highlight ruby %}
+
+<xml>
+    <ToUserName><![CDATA[gh_680bdefc8c5d]]></ToUserName>
+    <FromUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></FromUserName>
+    <CreateTime>1377886191</CreateTime>
+    <MsgType><![CDATA[event]]></MsgType>
+    <Event><![CDATA[CLICK]]></Event>
+    <EventKey><![CDATA[天气深圳]]></EventKey>
+</xml>
+
+{% endhighlight %}
+
+XML格式讲解
+
+{% highlight ruby %}
+
+ToUserName     接收方微信号
+FromUserName 发送方微信号，若为普通用户，则是一个OpenID
+CreateTime     消息创建时间
+MsgType     消息类型，event
+Event     事件类型，subscribe(订阅)、unsubscribe(取消订阅)、CLICK(自定义菜单点击事件)
+EventKey 事件KEY值，与自定义菜单接口中KEY值对应
+
+{% endhighlight %}

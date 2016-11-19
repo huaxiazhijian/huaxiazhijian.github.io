@@ -1,0 +1,65 @@
+---
+layout:     post
+title:      "五种方式获取文件扩展名-转载未验证「原」"
+subtitle:   "Five ways to get file extensions - reproduced without verification   "
+date:       2014-5-28
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/kzm.jpg"
+tags:
+    - PHP
+    - 扩展名
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+{% highlight ruby %}
+
+<?php
+ 
+ $file = ‘siyuantlw/程序设计.php’;
+ 
+ function getExt1($file) {
+  return substr(strrchr($file,’.'),1);
+ }
+ function getExt2($file) {
+  return substr($file,strrpos($file,’.')+1);
+ }
+ function getExt3($file) {
+  return strrev(substr(strrev($file),0,strpos(strrev($file),’.')));
+ }
+ function getExt4($file) {
+  return array_pop(explode(‘.’,$file)); #array_pop 介绍
+ }
+ function getExt5($file) {
+  $arr = pathinfo($file);
+  return $arr['extension'];
+  #或者写成下面这种
+  #return pathinfo($file,PATHINFO_EXTENSION);
+ }
+ function getExt6($file) {
+  $temp = strtok($file, ‘.’); #strtok函数说明
+     while($temp !== false ){
+         $file_extension = $temp;
+         $temp = strtok(‘.’);
+     }
+     return $file_extension;
+ }
+
+function getExt7($file) {
+  while($dot = strpos($file, “.”))
+  {
+   $file = substr($file, $dot+1);
+  }
+  return $file;
+ }
+ echo getExt1($file).’<br />’;
+ echo getExt2($file).’<br />’;
+ echo getExt3($file).’<br />’;
+ echo getExt4($file).’<br />’;
+ echo getExt5($file).’<br />’;
+ echo getExt6($file).’<br />’;
+
+echo getExt7($file).’<br />’;
+
+{% endhighlight %}

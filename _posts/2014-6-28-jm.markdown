@@ -1,0 +1,241 @@
+---
+layout:     post
+title:      "PHP加密技术「转」"
+subtitle:   "PHP encryption technology  "
+date:       2014-6-8
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/jm.jpg"
+tags:
+    - PHP
+    - 加密
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+一、MD5加密
+
+直接干，这里以一个登录页面为例：
+
+{% highlight ruby %}
+
+<?php
+require_once 'config/database.config.php';
+
+$act=$_REQUEST['act'];
+$username=$_POST['username'];
+$password=md5($_POST['password']);
+
+if ($act=='reg') {
+    $sql="INSERT INTO user(username,password) VALUES('{$username}','{$password}')";
+    $result=mysqli_query($link, $sql);
+    
+    if ($result) {
+        echo "Success";
+        echo "<meta http-equiv='refresh' content='1;url=login.html'/>";
+    }else {
+        echo "Failure!";
+        echo "<meta http-equiv='refresh' content='1;url=reg.html'/>";
+    }
+}elseif ($act=='login') {
+    $sql="SELECT * FROM user WHERE username='{$username}' AND password='{$password}'";
+    $result=mysqli_query($link, $sql);
+    $validate=mysqli_fetch_array($result);
+    #//var_dump($validate);
+    if ($validate) {
+        echo "success";
+        echo "<meta http-equiv='refresh' content='1;url=http://www.baidu.com'/>";
+    }else {
+        echo "failure";
+        echo "<meta http-equiv='refresh' content='1;url=login.html'/>";
+    }
+}
+
+{% endhighlight %}
+
+主要就是记得比对的时候也使用MD5，所以存在数据库中的时候就是密码保存的了
+
+{% highlight ruby %}
+
+mysql> SELECT * FROM user;
++----+----------+----------------------------------+
+| id | username | password                         |
++----+----------+----------------------------------+
+|  1 | 123      | d41d8cd98f00b204e9800998ecf8427e |
+|  2 | 123      | 5e12a8f9c9e959060fdcaea165393039 |
+|  3 |          | d41d8cd98f00b204e9800998ecf8427e |
+|  4 | root     | 202cb962ac59075b964b07152d234b70 |
+|  5 | root     | 0c51f0ba4316a5c844397f69effe2d01 |
++----+----------+----------------------------------+
+
+{% endhighlight %}
+
+二、Crypt加密算法
+
+同样是一个单向加密算法，无法由密文直接得到明文密码（和MD5一样）；
+
+语法：string crypt(string $str[,string $salt])，$str为加密明文，$salt为干扰项，可以理解为椒盐噪声；
+
+{% highlight ruby %}
+
+#/**
+ #* Crypt
+ #*/
+echo crypt('shit');
+echo "<hr/>";
+echo crypt('shit','im');
+echo "<hr/>";
+if (CRYPT_EXT_DES) {
+    echo crypt('shit','this is a test');
+}
+echo "<hr/>";
+if (CRYPT_MD5) {
+    echo crypt('shit','$1$this is a test$');
+}
+
+{% endhighlight %}
+
+基本没什么要说的，就一点，crypt的加密有不同的加密算法，默认的是MD5加密，但是若是不给定“盐值”，每次刷新，都是不一样的结果；
+
+然后可以指定盐值，具体参见手册，每个算法的盐值长度是不一样的，比如上述的DES和MD5，结果如下
+
+{% highlight ruby %}
+
+ 1223b8c30a347321299611f873b449ad
+ $1$ed0.Ph..$fPbfhSOMLyNdtZn9krT8X/
+ im37cLeO/JPaQ
+ th12A1V7QCns.
+ $1$this is $Bu9FE8Y8oGnIbftjDA4ez0
+
+{% endhighlight %}
+
+DES只能取两位，而MD5取了8位；
+
+用法上也差不多，记得输入盐值才好。
+
+三、Sha1
+
+同样是单向加密，不可破解（但网上的办法都是类似数据库一样的“伪暴力”破解）；
+
+与MD5的区别在于返回更长的（40位）16进制的数串（MD5是32位）；
+
+{% highlight ruby %}
+
+#/**
+ #* Sha1
+ #*/
+echo "<hr/>";
+echo sha1('shit');
+echo "<hr/>";
+echo sha1('shit',true);    
+echo "<hr/>";
+echo sha1('admin');
+
+{% endhighlight %}
+
+所以，一般加密保存，不要单独使用这些密码，不如这样子混合使用：
+
+{% highlight ruby %}
+
+echo "<hr/>";
+echo sha1(sha1('admin',true));
+echo "<hr/>";
+echo sha1(md5('admin'));
+
+{% endhighlight %}
+
+等于是加密外面又自行进行了简单的加密！！
+
+四、URL编码加密
+
+对地址栏信息进行加密；
+
+双向，urlencode和urldecode；
+
+{% highlight ruby %}
+
+#/**
+ #* URL编码加密
+ #*/
+
+$str="this is a test";
+$result=urlencode($str);
+echo $result;
+echo "<hr/>";
+echo urldecode($result);
+echo "<hr/>";
+$str="login.php?username=shit&action=act%3 hape#123\\";
+echo urlencode($str);
+echo "<hr/>";
+
+echo "<a href='index.php?username=shit&gender=male'>Shit Login</a>";
+print_r($_GET);
+echo "<hr/>";
+#//所以地址栏进行一下编码，一方面是保密，一方面是处理特殊情况
+#//比如username&shit是一个整体，不编码的话，浏览器是看不出的
+echo "<a href='index.php?username=username&shit&gender=male'>Shit Login2</a>";
+print_r($_GET);
+echo "<hr/>";
+$str="username&shit";
+$str2="username=".urlencode($str)."&gender=".urlencode("male");
+echo "<a href='index.php?".$str2."'>Shit Login3</a>";
+print_r($_GET);
+echo "<hr/>";
+#//baidu example
+#//https://www.baidu.com/s?ie=utf8&wd=url%E7%BC%96%E7%A0%81%E5%8A%A0%E5%AF%86&tn=87048150_dg
+#//search url编码
+
+{% endhighlight %}
+
+结果如下
+
+{% highlight ruby %}
+
+this+is+a+test
+this is a test
+login.php%3Fusername%3Dshit%26action%3Dact%253+hape%23123%5C
+Shit LoginArray ( [username] => username&shit [gender] => male ) 
+Shit Login2Array ( [username] => username&shit [gender] => male ) 
+Shit Login3Array ( [username] => username&shit [gender] => male ) 
+
+{% endhighlight %}
+
+所以功能就是：地址栏更加安全，不再明文传输，另一个解决特殊情况的传递
+
+ 
+
+五、Base64编码加密
+
+其实base64不是加密技术，只不过他会对data进行base64的编码，也可以看做是一种加密技术；
+
+{% highlight ruby %}
+
+#/**
+ #* Base64
+ #*/
+
+$data="I am king";
+echo base64_encode($data);
+echo "<hr/>";
+echo base64_decode(base64_encode($data));
+echo "<hr/>";
+echo base64_encode("中文测试");
+echo "<hr/>";
+#// echo base64_decode("R0lGODlhAQABAIAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==");
+$data=file_get_contents("0.jpg");
+echo base64_encode($data);
+
+{% endhighlight %}
+
+ 等于说是对内容进行加密；
+
+ 
+
+总结
+
+单项散列加密：得到固定长度的输出，是单向的；
+
+对称散列加密：使用同一把密钥进行加密解密，可以相互推算；（算法简单，效率高，开销小，适合对大量数据进行加密）DES等
+
+非对称加密技术：密钥不一样，公钥和私钥之分
+

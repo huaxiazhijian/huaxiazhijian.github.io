@@ -1,0 +1,206 @@
+---
+layout:     post
+title:      "微信公众平台开发入门教程（一）「转」"
+subtitle:   "WeChat public platform development introductory tutorial（一） "
+date:       2016-10-8
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/w1.jpg"
+tags:
+    - 微信开发
+    - 教程
+    - 转载
+---
+	
+> 下滑这里查看更多内容
+
+本系列教程将引导你完成如下任务：
+
+1.创建新浪云计算平台应用
+2.启用微信公众平台开发模式
+3.体验常用接收消息及发送消息类型
+4.了解数据收发原理及消息格式
+
+### 第一章 申请服务器资源
+
+## 创建新浪云计算应用
+
+申请账号
+
+我们使用SAE新浪云计算平台作为服务器资源，并且申请PHP环境+MySQL数据库作为程序运行环境。
+申请地址为：
+
+http://www.sinacloud.com/
+
+直接点击上述网址，可以看到右上角微博登录的链接。
+
+<img src="../../../../img/blog/2014/weixinkaifa1/101.jpg" alt="">
+
+点击进入之后，使用新浪微博账号登录 
+<img src="../../../../img/blog/2014/weixinkaifa1/1.jpg" alt="">
+
+登录之后，按照提示注册个人信息即可。 
+
+创建新应用 http://www.cnblogs.com/txw1958/p/wechat-tutorial.html 
+
+回到首页，在菜单顶部选择 控制台 ，再选择 云应用SAE 。
+
+<img src="../../../../img/blog/2014/weixinkaifa1/2.jpg" alt="">
+
+进入SAE应用列表
+
+<img src="../../../../img/blog/2014/weixinkaifa1/3.jpg" alt="">
+
+点击下侧的创建
+
+<img src="../../../../img/blog/2014/weixinkaifa1/4.jpg" alt="">
+
+选择一个未使用的appid，如果老是已经被使用不知道该什么好，就填写你的QQ号或者手机号吧。
+
+填写二级域名AppID、应用名称、验证码，开发语言选择PHP5.3，全部应用和框架下面选择第一个【PHP 空应用】。然后点击左下方的创建应用
+
+<img src="../../../../img/blog/2014/weixinkaifa1/5.jpg" alt="">
+
+应用创建成功。并自动跳转到应用列表中，可以看到已经有刚才创建的1354386063这个应用。
+
+<img src="../../../../img/blog/2014/weixinkaifa1/6.jpg" alt="">
+
+创建版本 
+
+点击刚才创建的应用名称，进入应用主页。
+
+点击左侧的应用管理下面的代码管理，
+
+<img src="../../../../img/blog/2014/weixinkaifa1/7.png" alt="">
+
+在代码管理中，选择使用SVN托管的方式。
+
+<img src="../../../../img/blog/2014/weixinkaifa1/8.jpg" alt="">
+
+跳转到代码管理
+
+<img src="../../../../img/blog/2014/weixinkaifa1/9.png" alt="">
+
+点击右侧的“创建版本”
+
+<img src="../../../../img/blog/2014/weixinkaifa1/10.jpg" alt="">
+
+版本号默认为1，点击创建，有时会弹出安全登录，需要输入安全密码，如果不知道或者忘记了，就点里面的找回密码，重新设置一下。：
+
+<img src="../../../../img/blog/2014/weixinkaifa1/11.jpg" alt="">
+
+验证通过之后，如下所示
+
+<img src="../../../../img/blog/2014/weixinkaifa1/12.png" alt="">
+
+到这里，就成功创建了一个域名URL为 http://1354386063.sinaapp.com/ 的应用了，记住你的这个URL，后面将会用到。
+
+ 
+
+下述代码是一个微信接口文件，看不懂没有关系，你可以暂时不用弄明白它的意思。
+
+如果想弄明白，可以购买《微信公众平台开发最佳实践》，在该书中第25页~第27页有详细讲解。
+
+{% highlight ruby %}
+
+<?php
+
+
+define("TOKEN", "weixin");
+$wechatObj = new wechatCallbackapiTest();
+if (isset($_GET['echostr'])) {
+    $wechatObj->valid();
+}else{
+    $wechatObj->responseMsg();
+}
+
+class wechatCallbackapiTest
+{
+    public function valid()
+    {
+        $echoStr = $_GET["echostr"];
+        if($this->checkSignature()){
+            header('content-type:text');
+            echo $echoStr;
+            exit;
+        }
+    }
+
+    private function checkSignature()
+    {
+        $signature = $_GET["signature"];
+        $timestamp = $_GET["timestamp"];
+        $nonce = $_GET["nonce"];
+
+        $token = TOKEN;
+        $tmpArr = array($token, $timestamp, $nonce);
+        sort($tmpArr, SORT_STRING);
+        $tmpStr = implode( $tmpArr );
+        $tmpStr = sha1( $tmpStr );
+
+        if( $tmpStr == $signature ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function responseMsg()
+    {
+        $postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+
+        if (!empty($postStr)){
+            $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+            $fromUsername = $postObj->FromUserName;
+            $toUsername = $postObj->ToUserName;
+            $keyword = trim($postObj->Content);
+            $time = time();
+            $textTpl = "<xml>
+                        <ToUserName><![CDATA[%s]]></ToUserName>
+                        <FromUserName><![CDATA[%s]]></FromUserName>
+                        <CreateTime>%s</CreateTime>
+                        <MsgType><![CDATA[%s]]></MsgType>
+                        <Content><![CDATA[%s]]></Content>
+                        <FuncFlag>0</FuncFlag>
+                        </xml>";
+            if($keyword == "?" || $keyword == "？")
+            {
+                $msgType = "text";
+                $contentStr = date("Y-m-d H:i:s",time());
+                $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, $msgType, $contentStr);
+                echo $resultStr;
+            }
+        }else{
+            echo "";
+            exit;
+        }
+    }
+}
+?>
+
+{% endhighlight %}
+
+我们将使用上述代码与微信公众平台对接
+回到SAE的代码管理界面中。
+
+<img src="../../../../img/blog/2014/weixinkaifa1/13.png" alt="">
+
+再选择“上传代码包”，点击上传文件，选择刚才的index.zip文件，点击上传，上传成功后中间是一个绿色的横条，如下所示
+<img src="../../../../img/blog/2014/weixinkaifa1/14.jpg" alt="">
+
+如果没有绿色的横条，表示上传失败，需要重试。可以考虑在Chrome浏览器下重试一下。
+
+点击编辑代码按钮，
+
+<img src="../../../../img/blog/2014/weixinkaifa1/15.png" alt="">
+
+有时候需要输入自己的安全密码，如果不记得了就点击“找回密码”。
+<img src="../../../../img/blog/2014/weixinkaifa1/16.png" alt="">
+安全验证成功后继续之前的操作。
+
+我们可以看到index.php已经上传成功，双击可以查看编辑里面的代码
+<img src="../../../../img/blog/2014/weixinkaifa1/17.jpg" alt="">
+新浪云应用的创建就成功了。
+
+充值（本步骤可选择性进行）
+
+新浪云SAE实行的是配额免费+超额付费的方式，相关标准请查看SAE价格体系介绍。初期对于大部分用户来说免费配额已够用，如果您将来使用量比较大建议预先至少充值100元获得10000云豆，以免超额后应用被禁用而影响业务。

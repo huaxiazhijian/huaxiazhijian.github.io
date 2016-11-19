@@ -1,0 +1,44 @@
+---
+layout:     post
+title:      "PHP定时任务「原」"
+subtitle:   "PHP encryption technology  "
+date:       2014-7-17
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/dsjb.jpg"
+tags:
+    - PHP
+    - 定时任务
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+ignore_user_abort(); #关掉浏览器，PHP脚本也可以继续执行.
+set_time_limit(0); # 通过set_time_limit(0)可以让程序无限制的执行下去
+
+代码如下：
+
+{% highlight ruby %}
+
+<?php
+    ignore_user_abort(); 
+    set_time_limit(0); 
+    $interval = 5; # 每隔5秒运行
+    $k = 0;
+    do {
+　　　　$time = time();
+　　　　$file = './test.txt';
+　　　　$content = "cron:".date('Y-m-d H:i:s');
+　　　　$fp = fopen($file, 'a');
+　　　　fwrite($fp, $content);
+　　　　fclose($fp);
+　　　　if($k>=5){ 
+　　　　　　break;
+　　　　}
+　　　　$k++;
+　　　　sleep($interval); # 等待5秒钟
+　　} while (true);
+     
+?>
+
+{% endhighlight %}

@@ -1,0 +1,78 @@
+---
+layout:     post
+title:      "在Laravel框架里实现邮箱验证---发送邮件「转」"
+subtitle:   "In Laravel framework to implement validation email - email  "
+date:       2015-9-25
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2015/lyy.jpg"
+tags:
+    - PHP
+    - 邮箱验证
+    - laravel
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+　　　　在经过一段时间的使用后,发现在项目中很多地方需要用到用户验证,以短信验证和邮箱验证为主流趋势,小靈总结了如果在Laravel框架中实现发送邮件功能,以后会陆续更上如何实现短信验证.....　　
+
+在.env文件下
+
+ 1.配置Laravel文件
+
+     MAIL_DRIVER=smtp  #//建议使用smtp方式
+
+     MAIL_HOST=smtp.163.com  #//建议使用163邮箱 QQ邮箱会有报错
+
+     MAIL_PORT=25        #//smtp 默认为25   
+
+     MAIL_USERNAME=null   #//自己的163帐号
+
+     MAIL_PASSWORD=null #//客户端密码
+
+     MAIL_ENCRYPTION=null
+<img src="../../../../img/blog/2015/ldy/1.png" alt="">
+2.修改config/email.php文件中的 
+
+       'from' => ['address' => null, 'name' => null],   #//手册上未提示,但实际应用中  如果为addredd=>null则报错,需要天写自己的163地址
+<img src="../../../../img/blog/2015/ldy/2.png" alt="">
+3. 注册163的邮箱并进行邮箱帐号设置  POP3/SMTP/IMAP都要开启   并开启授权码并进行手机验证
+<img src="../../../../img/blog/2015/ldy/3.png" alt="">
+4.参照Laravel手册里的邮件发送
+
+                必须注意的是  在控制器引用邮件发送时  必须首先引用use  Mail
+
+    ​    ​    ​    ​发送邮件测试
+
+    ​    ​    ​    ​在路由里设置 
+<img src="../../../../img/blog/2015/ldy/4.png" alt="">
+  ​在控制器中写入方法
+<img src="../../../../img/blog/2015/ldy/5.png" alt="">
+ ​其中
+
+1:Mail::raw  是发送原生数据,其他的内容发送方式在手册里都有提供;
+
+2.$message->subjuet('');是文件的标题
+
+3.$message->to();发送给谁
+
+    ​    ​    ​
+
+这是一份在 $message 消息生成器实例中可以使用的方法清单：
+
+$message->from($address, $name = null);
+$message->sender($address, $name = null);
+$message->to($address, $name = null);
+$message->cc($address, $name = null);
+$message->bcc($address, $name = null);
+$message->replyTo($address, $name = null);
+$message->subject($subject);
+$message->priority($level);
+$message->attach($pathToFile, array $options = []);
+
+#// 以原始 $data 字符串附加一个文件...
+$message->attachData($data, $name, array $options = []);
+
+#// 获取底层的 SwiftMailer 消息实例...
+$message->getSwiftMessage();
+	 

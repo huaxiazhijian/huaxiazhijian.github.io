@@ -1,0 +1,105 @@
+---
+layout:     post
+title:      "php 分享两种给图片加水印的方法「原」"
+subtitle:   "PHP share two kinds of watermarking methods to the picture  "
+date:       2014-6-15
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/sy.jpg"
+tags:
+    - 图片
+    - 水印
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+方法一：PHP最简单的加水印方法
+
+{% highlight ruby %}
+			
+<?php
+#// http://www.manongjc.com
+$img = imagecreatefromjpeg($filename);
+$logo = imagecreatefromjpeg($filename);
+#/*imagecraetefromjpeg-由文件或URL创建一个新图像
+#imagecreatefromjpeg(string $filename)
+#如果启用了fopen包装器，URL可以作为文件名*/
+#imagecopy($img,$logo,15,15,0,0,$width,$height);
+#/*imagecopy($dst_im,$src_im,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h)
+#$dst_im是背景图像，就是需要添加水印的图片
+#$src_im是水印图片；$dst_x,#dst_y需要把水印放到背景图片的(x,y)坐标;
+#$src_x,$src_y是截取水印的图片的开始坐标
+#$width，$height是截取的图片的就是水印的长度和宽度*/
+$url = 'http://www.stchat.cn/data/attachment/forum/201506/12/100759pidbdaydh8dy7iby.jpg';
+$content = file_get_contents($url);//把url写入到content这个变量里面
+#/*file_get_contents--将整个文件读入到一个字符串*/
+$filename = 'tmp.jpg';
+file_put_contents($filename,$content);
+#//把所有内容放到filename这个变量里面，第一个存放的是背景图片
+#/*file_put_contents(string $filename,mixed $data)将一个字符串写入一个文件
+filename要被写入数据的文件名
+data要写入的数据，类型可以是string,array或者是stream资源*/
+$url = '';
+file_put_contents('logo.png',file_get_contents($url));
+#//第二个是水印的图片
+$img = imagecreatefromjpeg($filename);
+$logo = imagecreatefrompng('logo.png');
+$size = getimagesize('logo.png');
+#/*getimagesize()获得图像大小*/
+imagecopy($img,$logo,15,15,0,0,$size[0],$size[1]);
+header("centent-type:image/jpeg");
+imagejpeg(img);
+?>
+			
+{% endhighlight %}
+
+方法二：php给图片加文字水印
+
+{% highlight ruby %}
+			
+<?php
+#// http://www.manongjc.com/article/593.html
+#/*给图片加文字水印的方法*/
+$dst_path = 'http://f4.topitme.com/4/15/11/1166351597fe111154l.jpg';
+$dst = imagecreatefromstring(file_get_contents($dst_path));
+#/*imagecreatefromstring()--从字符串中的图像流新建一个图像，返回一个图像标示符，其表达了从给定字符串得来的图像
+#图像格式将自动监测，只要php支持jpeg,png,gif,wbmp,gd2.*/
+  
+$font = './t1.ttf';
+$black = imagecolorallocate($dst, 0, 0, 0);
+imagefttext($dst, 20, 0, 10, 30, $black, $font, 'Hello world!');
+#/*imagefttext($img,$size,$angle,$x,$y,$color,$fontfile,$text)
+#$img由图像创建函数返回的图像资源
+#size要使用的水印的字体大小
+#angle（角度）文字的倾斜角度，如果是0度代表文字从左往右，如果是90度代表从上往下
+#x,y水印文字的第一个文字的起始位置
+#color是水印文字的颜色
+#fontfile，你希望使用truetype字体的路径
+#http://www.manongjc.com/article/1302.html */
+list($dst_w,$dst_h,$dst_type) = getimagesize($dst_path);
+#/*list(mixed $varname[,mixed $......])--把数组中的值赋给一些变量
+#像array()一样，这不是真正的函数，而是语言结构，List()用一步操作给一组变量进行赋值*/
+#/*getimagesize()能获取到什么信息？
+getimagesize函数会返回图像的所有信息，包括大小，类型等等*/
+switch($dst_type){
+  case 1:#//GIF
+    header("content-type:image/gif");
+    imagegif($dst);
+    break;
+  case 2:#//JPG
+    header("content-type:image/jpeg");
+    imagejpeg($dst);
+    break;
+  case 3:#//PNG
+    header("content-type:image/png");
+    imagepng($dst);
+    break;
+  default:
+    break;
+  #/*imagepng--以PNG格式将图像输出到浏览器或文件
+  #imagepng()将GD图像流(image)以png格式输出到标注输出（通常为浏览器），或者如果用filename给出了文件名则将其输出到文件*/
+}
+imagedestroy($dst);
+?>
+			
+{% endhighlight %}

@@ -1,0 +1,154 @@
+---
+layout:     post
+title:      "yii2发送邮件教程「转」"
+subtitle:   "Tutorial yii2 to send mail  "
+date:       2015-9-30
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2015/yyy.jpg"
+tags:
+    - PHP
+    - 邮箱验证
+    - yii2
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+yii2中官方为了解决邮件发送问题，提供了swiftMailer扩展。
+
+我们先来了解下什么是swiftMailer。
+
+Swift是一个完全采用面向对象编码用于发送e-mail的PHP函数库。Swift不依赖于PHP的mail()函数，因为用它发送多封邮件时会占用较高的服务器资源。Swift通过直接连到SMTP服务器或MTA能够更快，更高效地发送邮件。
+
+官方文档上做出了简单的使用说明。我们也来参考下。
+
+1、利用composer进行安装
+
+{% highlight ruby %}
+
+php composer.phar require --prefer-dist yiisoft/yii2-swiftmailer
+
+{% endhighlight %}
+
+2、配置
+
+{% highlight ruby %}
+
+return [ 
+    //.... 
+    'components' => [ 
+        'mailer' => [ 
+            'class' => 'yii\swiftmailer\Mailer', 
+            'viewPath' => '@common/mail', 
+            // send all mails to a file by default. You have to set 
+            // 'useFileTransport' to false and configure a transport 
+            // for the mailer to send real emails. 
+            'useFileTransport' => false, 
+            'transport' => [ 
+                'class' => 'Swift_SmtpTransport', 
+                'host' => 'smtp.163.com', 
+                'username' => '***@163.com', 
+                'password' => '******', 
+                'port' => '25', 
+                'encryption' => 'tls', 
+            ], 
+            'messageConfig'=>[ 
+                'charset'=>'UTF-8', 
+                'from'=>['***@163.com'=>'白狼栈'] 
+            ], 
+        ], 
+    ], 
+];
+
+{% endhighlight %}
+
+3、简单使用
+
+{% highlight ruby %}
+
+$mail= Yii::$app->mailer->compose(); 
+$mail->setTo('***@qq.com'); //要发送给那个人的邮箱 
+$mail->setSubject("邮件主题"); //邮件主题 
+$mail->setTextBody('测试text'); //发布纯文字文本 
+$mail->setHtmlBody("测试html text"); //发送的消息内容 
+var_dump($mail->send()); 
+
+{% endhighlight %}
+
+测试发现$mail->setHtmlBody()发送邮件可以发送成功。但是$mail->setTextBody()不知道为啥试了10来次都没收到，回头我再试试。
+
+4、我们看看怎么批量发送邮件
+
+{% highlight ruby %}
+
+$users = ['***@qq.com', '******@qq.com']; 
+$messages = []; 
+foreach ($users as $user) {
+    $messages[] = Yii::$app->mailer->compose() 
+            ->setTo($user) 
+            ->setSubject('测试主题') 
+            ->setHtmlBody('测试内容'); 
+} 
+Yii::$app->mailer->sendMultiple($messages);
+
+{% endhighlight %}
+
+5、定义邮件模版，这样我们就可以更方便的构建我们的邮件模板了
+
+在步骤2中我们定义了viewPath指向common\mail。因此我们可以在该目录下创建新的模版文件test.php,内容自己随便定义就好。
+
+然后看看程序中怎么实现发送邮件
+
+{% highlight ruby %}
+
+
+
+$res = Yii::$app->mailer->compose('test') 
+    ->setTo('*******@qq.com') 
+    ->setSubject('Message subject') 
+    ->send(); 
+var_dump($res); //true
+
+
+
+{% endhighlight %}
+
+我们只需要在compose的第一个参数上填写该模版的文件名即可。
+
+注：我这里是偶尔发到qq的垃圾箱去了，大家测试的时候也记得去查看。
+
+实际上比如找回密码等内容时，内容基本上都是动态不定的，也就是说我们怎么实现传参呢？
+
+这个也是很简单，只需要指定compose的第二个参数即可
+
+{% highlight ruby %}
+
+//controller代码 
+Yii::$app->mailer->compose('test', ['title' => '测试']) 
+    ->setTo('422744746@qq.com') 
+    ->setSubject('Message subject') 
+    ->send(); 
+//test.php 
+<h2><?= $title ?></h2> 
+
+{% endhighlight %}
+
+6、你也可以为你的邮件定制layout，布局文件这里放到common\mail\layouts目录下面即可。
+
+现在我们有一个布局文件html.php，我们看看怎么利用布局文件发邮件。
+
+{% highlight ruby %}
+
+Yii::$app->mailer->compose('test', [ 
+    'html' => 'html', //key固定,value是模版文件名 
+    'title' => 333 
+]) ->setTo('422744746@qq.com') 
+   ->setSubject('Message subject') 
+   ->send();
+
+{% endhighlight %}
+
+7、我们看看如何发送带附件的邮件
+
+我们举一个发送邮件并以附件的形式带上一张图片和一个txt文本内容试试看
+

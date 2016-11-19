@@ -1,0 +1,129 @@
+---
+layout:     post
+title:      "伪静态规则的书写「原」"
+subtitle:   "Pseudo static rules of writing  "
+date:       2015-11-13
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/wjt.jpg"
+tags:
+    - 伪静态
+    - 重写规则
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+这里以阿帕奇为服务器软件，直接上案例：
+
+1.把index.html重定向到index.php
+
+{% highlight ruby %}
+			
+RewriteEngine On
+
+Options -Indexes
+
+ReWriteRule ^index.html$  /index.php  [NC]
+			
+{% endhighlight %}
+
+效果：访问www.test.com/index.html效果等于www.test.com/index.php
+
+ 
+
+2.把index重定向到index.php
+
+{% highlight ruby %}
+			
+RewriteEngine On
+
+Options -Indexes
+
+ReWriteRule ^index$  /index.php  [NC]
+			
+{% endhighlight %}
+
+效果：访问www.test.com/index效果等于www.test.com/index.php
+
+ 
+
+3.根目录下的PHP文件，用html后缀也能访问
+
+写法1：
+
+{% highlight ruby %}
+			
+RewriteEngine On
+Options -Indexes
+
+ReWriteRule ^([a-zA-Z0-9_]{1,})\.html$  /$1.php  [NC]
+			
+{% endhighlight %}
+
+效果：   访问www.test.com/index.html效果等于www.test.com/index.php
+
+　　　　访问www.test.com/abc.html效果等于www.test.com/abc.php
+
+ 4.根目录下的php文件，直接访问文件名效果一样
+
+{% highlight ruby %}
+			
+RewriteEngine On
+Options -Indexes
+
+ReWriteRule ^([a-zA-Z0-9_]{1,})$  /$1.php  [NC]
+			
+{% endhighlight %}
+
+效果：   访问www.test.com/index效果等于www.test.com/index.php
+
+　　　　访问www.test.com/abc效果等于www.test.com/abc.php
+
+ 
+
+5.访问文件名+html效果等效后缀为php的文件
+
+{% highlight ruby %}
+			
+RewriteEngine On
+Options -Indexes
+
+RewriteRule ^/?([a-z/]+)\.html$ $1.php [NC]
+			
+{% endhighlight %}
+
+效果：  
+
+　　　　访问www.test.com/index.html效果等于www.test.com/index.php
+
+　　　　访问www.test.com/abc/abc.html效果等于www.test.com/abc/abc.php
+
+ 6.访问所有目录下的文件等效于访问文件名+后缀
+
+{% highlight ruby %}
+			
+RewriteEngine On
+Options -Indexes
+
+RewriteRule ^/?([a-z/]+)$ $1.php [NC]
+			
+{% endhighlight %}
+
+效果：  
+
+　　　　访问www.test.com/index效果等于www.test.com/index.php
+
+　　　　访问www.test.com/abc/abc效果等于www.test.com/abc/abc.php
+
+7.404页面跳转设置
+
+　　目标：当用户访问我们不存在的页面时候，把网站内容跳转到404页面。在这里，我把404.html作为404页面，放在网站的根目录。
+
+{% highlight ruby %}
+			
+RewriteEngine On
+Options -Indexes
+ErrorDocument 404 /404.html
+			
+{% endhighlight %}
+
