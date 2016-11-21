@@ -1,0 +1,314 @@
+---
+layout:     post
+title:      "网站添加第三方登陆(PHP版) 「转」"
+subtitle:   "Landing site added a third party (PHP) "
+date:       2016-5-22
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2015/sanfang.jpg"
+tags:
+    - PHP
+    - 第三方登录
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+第三方登陆，顾名思义：用其他媒体的账号登陆一些网站，现在比较流行的第三方账号一般是：QQ，微博，微信。其他的平台也有，比如：人人，百度贴吧等，感觉这几个没有前面那三个出名，也没有前面那三个用的多，所以今天就说当前最为常用的微博和QQ的登陆方法。
+
+### 微博登陆
+
+　　先说使用新浪微博账号登陆我的网站，微博登陆我理解是有两种：一种是通过前台JS调用不涉及后端的代码就可以实现登陆的功能，另一种是通过SDK进行自己写页面和弹出确认框，自己处理逻辑，下面我会将这两种方法都写一下（其实也不算是两种，只是大体上称为前端和后端 - SDK不一样嘛）：
+
+第一种：
+
+　　1、先登陆微博的开放平台：http://open.weibo.com，在我的应用中添加自己的网站或者是应用，网站的话域名必须是备案过的域名，不备案的域名禁止添加。我添加是 "答疑之家"，等待审核，审通过添加成功之后，点击应用进去之后会看到左边的导航里面有个导航：部署微链接 ->微博登陆 ->微博登陆详细介绍里面就是微博登陆涉及到的文档的添加的步骤。
+
+<img src="../../../../img/blog/2015/sanfang/1.png" alt="">
+2.放置登陆按钮，逻辑大致如下：
+
+通过WBML方式
+{% highlight ruby %}
+
+  <!--没有回调函数的登录按钮-->                 
+  <wb:login-button type="3,2" ></wb:login-button>
+   
+  <!--有回调函数的登录按钮-->      
+  <wb:login-button type="3,2" onlogin="login" onlogout="logout" ></wb:login-button>
+  
+  // 如需添加回调函数，请在wbml标签中添加onlogin="login" onlogout="logout"，并定义login和logout函数。
+  function login(o) {
+      alert(o.screen_name)
+ }
+  
+ function logout() {
+     alert('logout');
+ }
+
+{% endhighlight %}
+
+通过Js的方式：
+
+{% highlight ruby %}
+
+ <div id="wb_connect_btn" ></div>
+  
+  WB2.anyWhere(function (W) {
+      W.widget.connectButton({
+          id: "wb_connect_btn",
+          type: '3,2',
+          callback: {
+              login: function (o) { //登录后的回调函数
+                  alert("login: " + o.screen_name)
+            },
+             logout: function () { //退出后的回调函数
+                 alert('logout');
+             }
+         }
+     });
+ });
+
+{% endhighlight %}
+
+添加必要的Js文件：
+
+在HTML标签中增加XML命名空间
+
+{% highlight ruby %}
+
+<html xmlns:wb="http://open.weibo.com/wb">
+
+{% endhighlight %}
+
+在HEAD头中引入WB.JS
+
+{% highlight ruby %}
+
+<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js?appkey=4121744546" type="text/javascript" charset="utf-8"></script>
+
+{% endhighlight %}
+
+在需要部署登录按钮的位置粘贴WBML代码
+
+{% highlight ruby %}
+
+<wb:login-button type="3,2" onlogin="login" onlogout="logout">登录按钮</wb:login-button>
+
+{% endhighlight %}
+
+第二种：通过PHP-SDK的方式
+
+这种感觉符合我的需要，可以直接在PHP端处理登陆后的逻辑，前端可以写自己想要的授权打开方式，所以我改用的这一种，首先你需要看一下文档：http://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6
+
+1：下载PHP-SDK开发包（http://open.weibo.com/wiki/SDK），借助于sdk能让你减少好多不必考虑的东西，所以下载文档还是很有必要的，不过牛逼的你可以袭击写调用方式，毕竟那个文档写的也不咋滴，因为他的代码风格并不是按照PHP PSR（http://www.kancloud.cn/thinkphp/php-fig-psr/3140）规范去写的，感觉很不专业，毕竟是让别人看的东西，规范是很重要的，至少不会挨那么多骂，哈哈！题外话啊！下面看看他的代码，你就该想吐槽了。。。。（换行方式，缩进，if 规范.. 不能忍）
+
+值得注意的是你要记住自己的app id 与key，然后在sdk中换成自己的id
+<img src="../../../../img/blog/2015/sanfang/2.png" alt="">
+2：前端open登陆授权页面，我是直接通过打开窗口的方式
+
+{% highlight ruby %}
+
+function oauthLogin() {
+      var A = window.open("http://***/public/tencentopen.html", "TencentLogin", "width=755, height=550,left=300px,top=60px,menubar=0,scrollbars=1,resizable=1,status=1,titlebar=0,toolbar=0,location=1");
+ }
+
+{% endhighlight %}
+
+请求地址的处理逻辑：
+
+{% highlight ruby %}
+
+     /**
+       * 微博打开登陆认证页面
+       * code:5000004
+       * time:2015.6.22
+       */
+      public function weiboopen()
+      {
+          include_once('weiboOauth/config.php' );
+          include_once('weiboOauth/saetv2.ex.class.php');
+ 
+         $weiboObj = new \SaeTOAuthV2(WB_AKEY, WB_SKEY );
+         $code_url = $weiboObj->getAuthorizeURL(WB_CALLBACK_URL);
+ 
+         header("Location:" . $code_url);
+     }
+
+{% endhighlight %}
+
+3：用户点击微博登陆后的认证返回逻辑：
+
+{% highlight ruby %}
+
+ /**
+     * 执行微博认证
+     * code:5000005
+     * time:2016.4.28
+     */
+    public function weibooauth()
+    {
+        include_once('weiboOauth/config.php' );
+        include_once('weiboOauth/saetv2.ex.class.php' );
+
+        $weiboObj = new \SaeTOAuthV2(WB_AKEY, WB_SKEY);
+
+        if (isset($_REQUEST['code'])) {
+            $keys = array();
+            $keys['code'] = $_REQUEST['code'];
+            $keys['redirect_uri'] = WB_CALLBACK_URL;
+            try {
+                $token = $weiboObj->getAccessToken('code', $keys) ;
+            } catch (OAuthException $e) {}
+        }
+
+        $succ['code'] = '100';
+        $succ['message'] = '授权成功';
+
+        $erro['code'] = '101';
+        $erro['message'] = '授权失败';
+
+        if(empty($token)) {
+            $msg = $erro;
+        } else {
+            $saeObj = new \SaeTClientV2(WB_AKEY, WB_SKEY, $token['access_token']);
+            $user_info = $saeObj->show_user_by_id($token['uid']);
+            $ret = $this->oauthLogin($user_info, 'weibo');
+
+            //授权失败
+            if(empty($ret)) {
+                $msg = $erro;
+            } else {
+                session('olas_access_token', $token['access_token']);
+                $msg = $succ;
+            }
+        }
+
+        $this->assign('msg', $msg);
+        $this->display('oauth');
+    }
+
+{% endhighlight %}
+
+4：授权成功以后：
+
+　　成功以后，你会把用户的信息写入到数据库，微博登陆会返回用户的昵称，头像信息（各个版本大小的头像），用户的性别等等，还有非常用户的用户uid，这个非常重要的，下次登陆会检查这个UID是不是通过微博登陆过。这个和腾讯的不一样，腾讯的不反回UID而是一个openid，不过性质是一样的，待会我会介绍。
+
+之后返回打开窗口的状态码，刷新父页面进行跳转。
+
+{% highlight ruby %}
+
+ $(document).ready(function(){
+        if($.trim($("#code").val()) == '100') {
+               $('#bodys').html("<div>授权成功，正在跳转 . . .</div>");
+               setTimeout("changewindows();", 800);
+        } else {
+                $('#bodys').html("<div style='color:red;'>授权失败，请重试！</div>");
+        }
+  });
+  function changewindows(){
+       window.opener.location.href = 'http://**';
+       window.close();
+ }
+
+{% endhighlight %}
+
+  可以了通过SDK中SaeTClientV2中的show_user_by_id就可以得到用户的信息了。你还可以看到那个Sae***因为这个PHP版本是SAE部门维护的，所以只SAE开头的。步骤挺简单的，大家可以认证阅读他的开发文档，反复调试应该不成问题。我看SDK是对微博开发文档的封装：OAuth2/authorize， OAuth2/access_token， OAuth2/get_token_info，OAuth2/revokeoauth2，OAuth2/get_oauth2_token
+
+
+### QQ登陆
+
+　　使用QQ登陆也是很常见的，毕竟使用QQ的人多啊！使用QQ就必须按照人家的规范来，不然人家不给授权啊！下面是步骤：
+
+1：和微博一样，首先要申请使用QQ互联，网址：http://connect.qq.com/manage/index 。首先创建应用，审核通过，不通过也可以使用，不过有限制，好像只能使用你自己的账号登陆，如下图：
+<img src="../../../../img/blog/2015/sanfang/3.png" alt="">
+
+2：一旦通过审核以后你就可以添加和修改自己网站的一些登陆信息，点击 应用基本信息，这里要特别注意回调地址，因为一旦写错不能进行授权认证，所以回调地址要特别的注意，我在接入的时候就是一直报错。还有一个要注意的是添加协作者，这个可以用作测试，很有用的。下面是我自己的网站添加的信息，大家可以瞅瞅，不过关键信息我已经抹去了，隐私嘛。
+<img src="../../../../img/blog/2015/sanfang/4.jpg" alt="">
+3：上面的进行完之后，你就可以下载sdk了（http://wiki.connect.qq.com/sdk%E4%B8%8B%E8%BD%BD），我下的是PHP-sdk，下载后把他放在根目录就可以了。然后本地访问配置（主要是配置自己的应用信息），它上面有一个例子，直接可以调用的那种
+
+然后直接js打开授权页，页面地址请求到后台的方法：
+
+{% highlight ruby %}
+
+     /**
+       * qq打开登陆认证页面
+       * code:5000006
+       * time:2016.4.24
+       */
+   public function tencentopen()
+   {
+       include_once("tencentOauth/qqConnectAPI.php");
+       $qc = new \QC();
+      $qc->qq_login();
+  }
+
+{% endhighlight %}
+
+授权成功以后要再次初始化那个sdk类：感觉这是他的BUG，必须拿上一次登陆返回的acs和open_id去初始化QC重新得到用户的信息。
+
+{% highlight ruby %}
+
+    //申请开发$openid
+  $obj = new \QC();
+  $acs = $obj->qq_callback();
+  $openid = $obj->get_openid();
+ 
+  //重新赋值，得到用户信息
+  $qc = new \QC($acs, $openid);
+  $user_info = $qc->get_user_info();
+
+{% endhighlight %}
+
+完整的代码如下：
+
+{% highlight ruby %}
+
+     /**
+       * qq登陆认证逻辑
+       * code:5000007
+       * time:2016.4.24
+       */
+      public function oauth()
+      {
+          include_once("tencentOauth/qqConnectAPI.php");
+  
+         //申请开发$openid
+         $obj = new \QC();
+         $acs = $obj->qq_callback();
+         $openid = $obj->get_openid();
+ 
+         //重新赋值，得到用户信息
+         $qc = new \QC($acs, $openid);
+         $user_info = $qc->get_user_info();
+ 
+         $succ['code'] = '100';
+         $succ['message'] = '授权成功';
+ 
+         $erro['code'] = '101';
+         $erro['message'] = '授权失败';
+ 
+         $msg = [];
+         if(empty($user_info)) {
+             $msg = $erro;
+         } else {
+             $user_info['openid'] = $openid;
+             $user_info['appid'] = C('QQ_APPID');
+             $ret = $this->oauthLogin($user_info, 'tencent');
+             
+             //授权失败
+             if(empty($ret)) {
+                 $msg = $erro;
+            } else {
+                 $msg = $succ;
+             }
+         }
+ 
+         $this->assign('msg', $msg);
+         $this->display('oauth');
+     }
+{% endhighlight %}
+
+这里要注意QQ和微博返回用户的ID是不一样的，微博返回的就是用户在微博的真实id，但是QQ不是。他返回的是qq号对应的一个open_Id，感觉腾讯有点扯淡，这直接导致，你无法得到登陆者的QQ号，有点悲哀，只得到一个和QQ号一一对应的open_id，也算不错了，哎！
+
+好了，到这里基本上把微博和QQ的登陆说完了，期间或遇到各种的问题，比如回调地址失败，登陆之后刷新父页面跳转等等，设计到各种的用户体验。
+
+如果大家在添加的时候遇到解决不了的问题可以Q我，我会的我一定给你说，大家共同提高嘛，另外上面说的不对的您可以通过评论告诉我，共同进步嘛。
