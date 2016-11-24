@@ -1,0 +1,64 @@
+---
+layout:     post
+title:      "MVC「转」"
+subtitle:   "MVC"
+date:       2015-8-15
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2015/an.jpg"
+tags:
+    - PHP
+    - MVC
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+不是技术，就是一种思想，将网站的用户操作，与后台对用户操作的处理(包含操作数据库)进行一种分离的思想。
+
+后台php永远是被用户的行为调用，要为用户的行为设置操作入口，
+
+操作入口：本质就是使用URL(只有一个privlege.php?action=值、goods.php?action=值)
+
+后台：
+
+    解析URL得到URL根据action进行判断    ==>MVC中的C
+
+    根据不同的action(行为)操作数据库，得到数据==>MVC中的M
+
+    使用的是include引入一个用于回显信息给用户的html文件(模板)==>    MVC中的V
+
+ 
+
+M：(module)模型        主要用于操作相应的数据表(表对应的类goods.class.php、category.class.php、user.class.php)
+
+V：(view)视图            就是用于承载php回显数据的html文档
+
+C：(controller)控制器    主要用于业务逻辑的处理，控制程序流程的走向
+
+ 
+
+形象比喻：
+
+用户是公司的大boss
+
+C(privilege.php、goods.php、index.php)        公司的中层
+
+ 
+
+    用户发出命令，公司中层收到命令(一个命令可以分多个步骤：1、读取数据是一个步骤，2、回显数据给用户)，公司中层派小弟1(user.class.php、goods.class.php)去读取数据，小弟1把数据返回给公司中层，公司中层再把数据交给小弟2，由小弟2来显示数据。
+
+ 
+
+user.class.php、goods.class.php为什么要继承DB类。
+
+对数据库的操作只有四种方法。此种操作应用在不同的模块中会体现出不同的事务。所以不能将每一个模块的业务都封装在DB类中，用模型类来封装同网站模块的不同业务。
+
+ 
+
+    用户所操作的都是程序员"预料之内的"行为，用户只能点击按钮或A链接，那A链接的href是程序员设计的。
+
+MVC图解： 
+
+<img src="../../../../img/blog/2014/mvc/1.png" alt="">
+拓展： 
+<img src="../../../../img/blog/2014/mvc/2.png" alt="">

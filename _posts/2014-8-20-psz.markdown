@@ -1,0 +1,319 @@
+---
+layout:     post
+title:      "php数组函数的联合使用「原」"
+subtitle:   "The combined use of PHP array functions"
+date:       2014-8-20
+author:     "LingDie | 靈蝶"
+header-img: "img/blog/2014/psz.jpg"
+tags:
+    - PHP
+    - 数组
+    - 原创
+---
+
+> 下滑这里查看更多内容
+
+ 什么是数组？
+在使用 PHP 进行开发的过程中，或早或晚，您会需要创建许多相似的变量。
+无需很多相似的变量，你可以把数据作为元素存储在数组中。
+数组中的元素都有自己的 ID，因此可以方便地访问它们。
+
+
+关联数组 
+关联数组，它的每个 ID 键都关联一个值。
+在存储有关具体命名的值的数据时，使用数值数组不是最好的做法。
+通过关联数组，我们可以把值作为键，并向它们赋值。
+
+ 
+
+这篇文章将介绍10个操作PHP关联数组的技巧，熟练运用能帮助你提高开发效率。
+
+1、添加数组元素
+PHP是一种弱类型语言，这意味着你不需要显示声明一个数组及其大小，相反，你可以同时声明并填充数组。
+
+{% highlight ruby %}
+
+$capitals = array(  
+  'Alabama' => 'Montgomery',  
+  'Alaska'  => 'Juneau',  
+  'Arizona' => 'Phoenix'  
+); 
+
+{% endhighlight %}
+
+额外的数组元素可以象下面这样追加：
+
+{% highlight ruby %}
+
+$capitals['Arkansas'] = 'Little Rock';
+
+{% endhighlight %}
+
+ 如果你正在处理数字索引数组，你可能想使用显示命名的函数前置和追加元素，如array_push()和array_unshift()函数，但这些函数不能操作关联数组。
+
+2、删除数组元素
+如果要从数组中删除一个元素，请使用unset()函数，如：
+
+{% highlight ruby %}
+
+unset($capitals['California']);
+
+{% endhighlight %}
+
+ 使用数字索引数组时，删除数组元素的办法更多，更灵活，可以使用array_shift()和array_pop()函数分别从数组的开头和末尾删除一个元素。
+
+3、交换键和值
+假设你想创建一个名叫$states的新数组，使用州府作为索引，使用州名作为关联值，使用array_flip()函数很容易完成这个任务。
+
+{% highlight ruby %}
+
+$capitals = array(  
+  'Alabama' => 'Montgomery',  
+  'Alaska'  => 'Juneau',  
+  'Arizona' => 'Phoenix'  
+);  
+$states = array_flip($capitals);  
+// $states = array(  
+//  'Montgomery' => string 'Alabama',  
+//  'Juneau'     => string 'Alaska',  
+//  'Phoenix'    => string 'Arizona'  
+// ); 
+
+{% endhighlight %}
+
+4、合并数组
+假设前面的数组由一个基于Web的“FlashCard”服务使用，你想提供一种方法测试学生对美国各州首府的掌握情况，你可以使用array_merge()函数合并包含州和首府的数组。
+
+{% highlight ruby %}
+
+$stateCapitals = array(  
+  'Alabama' => 'Montgomery',  
+  'Alaska'  => 'Juneau',  
+  'Arizona' => 'Phoenix'  
+);  
+$countryCapitals = array (  
+  'Australia' => 'Canberra',  
+  'Austria'   => 'Vienna',  
+  'Algeria'   => 'Algiers'  
+);  
+$capitals = array_merge($stateCapitals, $countryCapitals); 
+
+{% endhighlight %}
+
+5、编辑数组值
+假设在数组中的数据包含大小写错误，在插入到数据库之前，你想纠正这些错误，你可以使用array_map()函数给每个数组元素应用一个回调。
+
+{% highlight ruby %}
+
+function capitalize($element)  
+{  
+  $element = strtolower($element);  
+  return ucwords($element);  
+}  
+$capitals = array(  
+  'Alabama' => 'montGoMEry',  
+  'Alaska'  => 'Juneau',  
+  'Arizona' => 'phoeniX'  
+);  
+$capitals = array_map("capitalize", $capitals); 
+
+{% endhighlight %}
+
+6、按键对数组排序
+FlashCard程序常常使用各种排序，如按字母顺序排序，你可以使用ksort()函数按键对关联数组进行排序。
+
+{% highlight ruby %}
+
+$capitals = array(  
+  'Arizona' => 'Phoenix',  
+  'Alaska'  => 'Juneau',  
+  'Alabama' => 'Montgomery'  
+);  
+ksort($capitals); 
+
+{% endhighlight %}
+
+ 因为数组是通过参数传递给ksort()函数的，意味着你不再需要将排序结果分配给另一个变量。
+
+7、随机数组排序
+在FlashCard程序中还涉及到另一种随机排序技术，这时你要使用shuffle()函数实现数组项目的随机排序。
+
+{% highlight ruby %}
+
+$capitals = array(  
+  'Arizona' => 'Phoenix',  
+  'Alaska'  => 'Juneau',  
+  'Alabama' => 'Montgomery'  
+);  
+shuffle($capitals); 
+
+{% endhighlight %}
+
+ 如果不需要打乱数组顺序，你只是想随机选择一个值，那么使用array_rand()函数即可。
+
+8、确定键和值是否存在
+你可以使用in_array()函数确定一个数组元素是否存在。
+
+{% highlight ruby %}
+
+$capitals = array(  
+  'Arizona' => 'Phoenix',  
+  'Alaska'  => 'Juneau',  
+  'Alabama' => 'Montgomery'  
+);  
+if (in_array("Juneau", $capitals))  
+{  
+  echo "Exists!";  
+} else {  
+  echo "Does not exist!";  
+} 
+
+{% endhighlight %}
+
+很少有人知道这个函数也可以确定一个数组键是否存在，在这一点上，它和array_key_exists()函数的功能一样。
+
+{% highlight ruby %}
+
+$capitals = array(  
+  'Arizona' => 'Phoenix',  
+  'Alaska'  => 'Juneau',  
+  'Alabama' => 'Montgomery'  
+);  
+if (array_key_exists("Alaska", $capitals))  
+{  
+  echo "Key exists!";  
+} else {  
+  echo "Key does not exist!";  
+} 
+
+{% endhighlight %}
+
+9、搜索数组
+你可能想搜索数组资源，这样用户就可以方便地用一个特定的州府检索关联的州，可以通过array_search()函数实现数组搜索。
+
+{% highlight ruby %}
+
+$capitals = array(  
+  'Arizona' => 'Phoenix',  
+  'Alaska'  => 'Juneau',  
+  'Alabama' => 'Montgomery'  
+);  
+$state = array_search('Juneau', $capitals);  
+// $state = 'Alaska' 
+
+{% endhighlight %}
+
+10、标准PHP库
+标准PHP库（Standard PHP Library，SPL）为开发人员提供了许多数据结构，迭代器，接口，异常和其它以前PHP语言没有的功能，使用这些功能可以通过面向对象的语法遍历数组。
+
+{% highlight ruby %}
+
+$capitals = array(  
+  'Arizona' => 'Phoenix',  
+  'Alaska'  => 'Juneau',  
+  'Alabama' => 'Montgomery'  
+);  
+$arrayObject = new ArrayObject($capitals);  
+foreach ($arrayObject as $state => $capital)  
+{  
+  printf("The capital of %s is %s<br />", $state, $capital);  
+}  
+// The capital of Arizona is Phoenix  
+// The capital of Alaska is Juneau  
+// The capital of Alabama is Montgomery 
+
+{% endhighlight %}
+
+ 这仅仅是SPL众多伟大功能中的一个，一定要阅读PHP文档了解更多信息。
+
+ 
+搜索PHP关联数组搜索键和值技巧在数组处理时非常有用，网上收集如下：
+
+1.搜索关联数组键
+  如果在一个数组中找到一个指定的键，函数array_key_exists()返回TRUE，否则返回FALSE。其
+形式如下：
+
+{% highlight ruby %}
+
+booiean array_key_exists(mixed key, array array)
+
+{% endhighlight %}
+
+下面的例子将在数组键中搜索Ohio，如果找到，将输出这个州加入美国联邦政府的育关信息：
+
+{% highlight ruby %}
+
+$state["Delaware"]="December 7,1787";
+$state["Pennsylvania"]="December 12, 1787";
+$state["Ohio"]="March l,1803";
+if (array_key_exists("Ohio", $state))
+  printf("Ohio joined the Union on %s", $state["Ohio"]);
+
+{% endhighlight %}
+
+结果如下：
+2．搜索关联数组值
+  array_search()函数在一个数组中搜索一个指定的值，如果找到则返回相应的键，否则返回FALSE。
+其形式如下：
+下面的例子在$state中搜索一个特定的日期(December7)，如果找到，则返回相应州的有关信息：
+
+{% highlight ruby %}
+
+$state["Ohio"] = "March l"; .
+$statef"Delaware"l = "December 7";
+$state["Pennsylvania"] = "December 12u;
+$founded = array_search("December 7", $state),
+i+ ($founded) printf("%s was founded on %s.", $founded, $state[$founded]);
+
+{% endhighlight %}
+
+输出如下：
+Delaware was十ounded on December 7.
+获取数组键
+    array_keys()函数返回一个数组，其中包含所搜索数组中找到的所有键。其形式知下：
+    array array_keys(array array(J mixed search_value])
+    如果包含可选参数search value，则只会返回与该值匹配的键。下面的例子将输出$state数组中
+找到的所有键值：
+
+{% highlight ruby %}
+
+$state["Delaware"] = "December 7, 1787";
+$state["Pennsylvania"] = "December 12, i787";
+$state["New Jersey"] = "December 18, 1787";
+$keys = array_keys($state);
+print_r($keys);
+
+{% endhighlight %}
+
+输出如下：
+获取数组值
+    array_values()函数返回一个数组中的所有值，并自动为返回的数组提供数值索引。其形式如下：
+    array array_values(array array)
+5.5遍历数组  87
+下面的例子将获取$population中找到的各州人口数：
+$population=array("Ohio"=>"11,421,267", "Iowa"=>"2,936,760");
+print_r(array_values($population》;
+这个例子的输出如下：
+遍历数组
+    通常需要遍历数组并获得各个键或值（或者同时获得键和值），所以毫不奇怪，PHP为此提供了
+一些函数来满足需求。许多函数能完成两项任务，不仅能获取当前指针位置的键或值，还能将指针移
+向下一个适当的位置。本节将介绍这些函数。
+5.5.1  获取当前数组键
+key()函数返回input_array中当前指针所在位置的键。其形式如下：
+mixed key(array array)
+下面的例子通过迭代处理数组并移动指针来输出$capitals数组的键：
+
+{% highlight ruby %}
+
+$capitals=array("Ohio"=>"Columbus", "Iowa"=>"Des Moines");
+echo "
+
+Can you name the capitals of these states?
+";
+while($key=key($capitals)){
+    printf("%s",$key);
+    next($capitals);
+
+{% endhighlight %}
+
+将返回以下结果：Ohio
