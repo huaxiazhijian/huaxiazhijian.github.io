@@ -2,7 +2,7 @@
 layout:     post
 title:      "php中读写excel表格文件示例 「转」"
 subtitle:   "PHP to read and write excel spreadsheet file example  "
-date:       2014-4-25
+date:       2016-4-25
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/excel.jpg"
 tags:

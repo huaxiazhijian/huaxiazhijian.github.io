@@ -2,7 +2,7 @@
 layout:     post
 title:      "PHP中require和include的区别 「转」"
 subtitle:   "The difference between the require in the PHP and include "
-date:       2014-3-5
+date:       2014-12-5
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/include.jpg"
 tags:

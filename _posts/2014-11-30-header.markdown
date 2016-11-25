@@ -2,7 +2,7 @@
 layout:     post
 title:      "PHP 常用的header头部定义汇总「转」"
 subtitle:   "PHP common header header definition"
-date:       2014-9-30
+date:       2014-11-30
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2015/yyy.jpg"
 tags:

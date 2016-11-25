@@ -2,7 +2,7 @@
 layout:     post
 title:      "php如何防止图片盗用/盗链的两种方法  「转」"
 subtitle:   "How to prevent picture theft/PHP hotlinking two methods  "
-date:       2014-4-20
+date:       2016-2-20
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/dao.jpg"
 tags:

@@ -2,7 +2,7 @@
 layout:     post
 title:      "php的冒泡排序和快速排序  「转」"
 subtitle:   "PHP bubble sort and quick sort  "
-date:       2014-4-13
+date:       2016-1-13
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/suanfa.jpg"
 tags:

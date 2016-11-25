@@ -2,7 +2,7 @@
 layout:     post
 title:      "PHP图形操作之生成图像验证码「原」"
 subtitle:   "PHP to generate images of graphics operations captcha  "
-date:       2014-5-23
+date:       2016-9-23
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/yan.jpg"
 tags:

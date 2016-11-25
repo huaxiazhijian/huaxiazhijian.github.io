@@ -2,7 +2,7 @@
 layout:     post
 title:      "设置session生存时间问题  「原」"
 subtitle:   "Set up the session survival time "
-date:       2014-4-1
+date:       2015-12-21
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/session.jpg"
 tags:

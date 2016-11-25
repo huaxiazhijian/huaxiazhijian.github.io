@@ -2,7 +2,7 @@
 layout:     post
 title:      "PHP 安全性漫谈 Linux+Apache+Mysql+PHP  「转」"
 subtitle:   "PHP security rambling Linux + Apache + PHP + Mysql  "
-date:       2014-3-20
+date:       2015-3-20
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/anquan.jpg"
 tags:

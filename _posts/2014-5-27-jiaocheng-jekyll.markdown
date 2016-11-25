@@ -2,7 +2,7 @@
 layout:     post
 title:      "jekyll:搭建自己的博客「原」"
 subtitle:   "jekyll:Set up his own blog"
-date:       2014-2-27
+date:       2014-5-27
 author:     "LingDie | 靈蝶"
 header-img: "img/12.jpg"
 tags:

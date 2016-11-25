@@ -2,7 +2,7 @@
 layout:     post
 title:      "PHP实现无限分类  「转」"
 subtitle:   "PHP implementation infinite classification  "
-date:       2014-4-1
+date:       2015-12-10
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/wu.jpg"
 tags:

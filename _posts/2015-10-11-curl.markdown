@@ -2,7 +2,7 @@
 layout:     post
 title:      "curl发送get和post请求  「转」"
 subtitle:   "Curl sends the get and post requests "
-date:       2014-4-1
+date:       2015-10-11
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/curl.jpg"
 tags:

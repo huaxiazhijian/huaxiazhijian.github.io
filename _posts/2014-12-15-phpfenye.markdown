@@ -2,7 +2,7 @@
 layout:     post
 title:      "漂亮的PHP分页「转」"
 subtitle:   "Beautiful PHP pages "
-date:       2014-3-5
+date:       2014-12-15
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/fenye.jpg"
 tags:

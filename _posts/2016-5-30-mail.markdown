@@ -2,7 +2,7 @@
 layout:     post
 title:      "php mail 函数发送邮件「原」"
 subtitle:   "The PHP mail function to send mail "
-date:       2014-4-30
+date:       2016-5-30
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/mail.jpg"
 tags:

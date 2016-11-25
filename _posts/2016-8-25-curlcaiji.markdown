@@ -2,7 +2,7 @@
 layout:     post
 title:      "php采集神器CURL使用方法详解「转」"
 subtitle:   "PHP acquisition artifact CURL usage explanation  "
-date:       2014-5-25
+date:       2016-8-25
 author:     "LingDie | 靈蝶"
 header-img: "img/blog/2014/caiji.jpg"
 tags:
